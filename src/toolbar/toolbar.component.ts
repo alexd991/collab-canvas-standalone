@@ -12,7 +12,12 @@ import { BrushControlComponent } from './brush-control/brush-control.component';
   templateUrl: './toolbar.component.html',
   styleUrl: './toolbar.component.less',
   standalone: true,
-  imports: [CommonModule, FormsModule, NgxColorsModule, BrushControlComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    NgxColorsModule,
+    BrushControlComponent
+  ],
 })
 export class ToolbarComponent {
   protected colour: string;

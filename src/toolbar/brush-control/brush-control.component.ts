@@ -1,4 +1,5 @@
-import { Component, ElementRef, HostListener, Signal, computed, input, signal } from '@angular/core';
+import { Component, ElementRef, HostListener, Signal, ViewEncapsulation, computed, input, signal } from '@angular/core';
+import { MatSliderModule } from '@angular/material/slider';
 import { CommonModule } from '@angular/common';
 import { CanvasControlService } from '../../canvas-control/canvas-control.service';
 
@@ -7,7 +8,11 @@ import { CanvasControlService } from '../../canvas-control/canvas-control.servic
   templateUrl: './brush-control.component.html',
   styleUrl: './brush-control.component.less',
   standalone: true,
-  imports: [CommonModule],
+  encapsulation: ViewEncapsulation.None,
+  imports: [
+    CommonModule,
+    MatSliderModule,
+  ],
 })
 export class BrushControlComponent {
   public showModal = signal(false);
