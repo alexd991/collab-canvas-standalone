@@ -1,8 +1,9 @@
 import { DOCUMENT } from '@angular/common';
-import { ChangeDetectionStrategy, Component, ElementRef, Inject, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, Inject, Signal, computed, signal, viewChild } from '@angular/core';
 import { Subscription, debounceTime, filter, fromEvent, map, pairwise, startWith, switchMap, takeUntil } from 'rxjs';
 import { CanvasControlService } from '../canvas-control/canvas-control.service';
 import { CursorMode, MousePositionData } from './canvas.models';
+import { WINDOW } from '../tokens/window.token';
 
 @Component({
   selector: 'app-canvas',
@@ -13,25 +14,26 @@ import { CursorMode, MousePositionData } from './canvas.models';
 })
 export class CanvasComponent {
   private _canvasElRef = viewChild.required<ElementRef<HTMLCanvasElement>>('canvas');
-  private _canvas!: HTMLCanvasElement;
+  private _canvas!: Signal<HTMLCanvasElement>;
   private readonly _subscriptions: Subscription = new Subscription();
 
   constructor(
     private readonly _elRef: ElementRef,
     private readonly _canvasControl: CanvasControlService,
-    @Inject(DOCUMENT) private readonly _document: Document
+    @Inject(DOCUMENT) private readonly _document: Document,
+    @Inject(WINDOW) private readonly _window: Window
   ) { }
 
   ngAfterViewInit() {
-    this._canvas = this._canvasElRef().nativeElement;
-    this._canvas.height = Math.floor(this._elRef.nativeElement.clientHeight);
-    this._canvas.width = Math.floor(this._elRef.nativeElement.clientWidth);
+    this._canvas = computed(() => this._canvasElRef().nativeElement);
+    this._canvas().height = Math.floor(this._elRef.nativeElement.clientHeight);
+    this._canvas().width = Math.floor(this._elRef.nativeElement.clientWidth);
 
     this.initialiseDrawEvents();
   }
 
   private initialiseDrawEvents(): void {
-    const canvasContext = this._canvas.getContext('2d')!;
+    const canvasContext = this._canvas().getContext('2d', { willReadFrequently: true })!;
     canvasContext.lineCap = 'round';
     canvasContext.lineJoin = 'round';
     canvasContext.lineWidth = this._canvasControl.strokeWidth();
@@ -39,14 +41,14 @@ export class CanvasComponent {
 
     // set the canvas as white - helps the fill tool function properly
     canvasContext.fillStyle = '#ffffff';
-    canvasContext.fillRect(0, 0, this._canvas.width, this._canvas.height);
+    canvasContext.fillRect(0, 0, this._canvas().width, this._canvas().height);
 
-    const mouseDown$ = fromEvent<MouseEvent>(this._canvas, 'mousedown');
+    const mouseDown$ = fromEvent<MouseEvent>(this._canvas(), 'mousedown');
     const mouseUp$ = fromEvent<MouseEvent>(this._document, 'mouseup');
-    const mousePositionData$ = fromEvent<MouseEvent>(this._canvas, 'mousemove').pipe(
+    const mousePositionData$ = fromEvent<MouseEvent>(this._canvas(), 'mousemove').pipe(
       map((event: MouseEvent) => ({
-        x: Math.floor(event.clientX - this._canvas.getBoundingClientRect().left),
-        y: Math.floor(event.clientY - this._canvas.getBoundingClientRect().top),
+        x: Math.floor(event.clientX - this._canvas().getBoundingClientRect().left),
+        y: Math.floor(event.clientY - this._canvas().getBoundingClientRect().top),
       })),
       pairwise(),
       map(([prev, curr]) => ({
@@ -72,6 +74,8 @@ export class CanvasComponent {
           switchMap(() => mousePositionData$.pipe(takeUntil(mouseUp$)))
         )
         .subscribe((mousePosData) => {
+          canvasContext.lineCap = 'round';
+          canvasContext.lineJoin = 'round';
           canvasContext.lineWidth = this._canvasControl.strokeWidth();;
           canvasContext.strokeStyle = this._canvasControl.colour();
 
@@ -79,26 +83,20 @@ export class CanvasComponent {
         })
     );
 
-
-
     this._subscriptions.add(
-      fromEvent(window, 'resize')
-        .pipe(
-          debounceTime(100)
-        )
-        .subscribe(() => {
-          const imageData = canvasContext.getImageData(0, 0, this._canvas.width, this._canvas.height);
+      fromEvent(this._window, 'resize').subscribe(() => {
+        const imageData = canvasContext.getImageData(0, 0, this._canvas().width, this._canvas().height);
 
-          this._canvas.height = Math.floor(this._elRef.nativeElement.clientHeight);
-          this._canvas.width = Math.floor(this._elRef.nativeElement.clientWidth);
+        this._canvas().height = Math.floor(this._elRef.nativeElement.clientHeight);
+        this._canvas().width = Math.floor(this._elRef.nativeElement.clientWidth);
 
-          canvasContext.fillStyle = '#ffffff';
-          canvasContext.fillRect(0, 0, this._canvas.width, this._canvas.height);
+        canvasContext.fillStyle = '#ffffff';
+        canvasContext.fillRect(0, 0, this._canvas().width, this._canvas().height);
 
-          if (imageData) {
-            canvasContext.putImageData(imageData, 0, 0);
-          }
-        })
+        if (imageData) {
+          canvasContext.putImageData(imageData, 0, 0);
+        }
+      })
     );
 
     this._subscriptions.add(
@@ -124,6 +122,6 @@ export class CanvasComponent {
 
   private clearCanvas(canvasContext: CanvasRenderingContext2D): void {
     canvasContext.fillStyle = '#ffffff';
-    canvasContext.fillRect(0, 0, this._canvas.width, this._canvas.height);
+    canvasContext.fillRect(0, 0, this._canvas().width, this._canvas().height);
   }
 }
