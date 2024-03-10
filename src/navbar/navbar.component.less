@@ -1,0 +1,36 @@
+@import "../styles/mixins.less";
+
+.full-size();
+
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  width: 100%;
+
+  .background-fade();
+
+  padding: 0 5%;
+
+  .icon {
+    flex-basis: 32px;
+    display: flex;
+    align-items: center;
+
+    img {
+      height: 40px;
+      width: auto;
+    }
+
+    &.clear-canvas {
+      color: #edeeff;
+      cursor: pointer;
+    }
+  }
+
+  .text {
+    font: normal 24px/32px Roboto;
+    vertical-align: baseline;
+  }
+}

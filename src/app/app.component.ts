@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import {  } from'@angular/animations';
 import { ToolbarComponent } from '../toolbar/toolbar.component';
 import { CanvasComponent } from '../canvas/canvas.component';
+import { NavbarComponent } from '../navbar/navbar.component';
 
 @Component({
   selector: 'app-root',
@@ -12,6 +13,7 @@ import { CanvasComponent } from '../canvas/canvas.component';
   imports: [
     ToolbarComponent,
     CanvasComponent,
+    NavbarComponent,
   ],
 })
 export class AppComponent {
