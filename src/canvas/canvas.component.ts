@@ -5,13 +5,13 @@ import { CanvasControlService } from '../canvas-control/canvas-control.service';
 import { CursorMode, MousePositionData } from './canvas.models';
 
 @Component({
-  selector: 'canvas-root',
+  selector: 'app-canvas',
   standalone: true,
   template: `<canvas #canvas></canvas>`,
   styleUrl: './canvas.component.less',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AppComponent {
+export class CanvasComponent {
   private _canvasElRef = viewChild.required<ElementRef<HTMLCanvasElement>>('canvas');
   private _canvas!: HTMLCanvasElement;
   private readonly _subscriptions: Subscription = new Subscription();

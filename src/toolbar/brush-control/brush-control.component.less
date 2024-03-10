@@ -1,0 +1,71 @@
+.icon {
+  display: block;
+  height: 30px;
+}
+
+.icon.brush:hover {
+  cursor: pointer;
+}
+
+.icon > img {
+  height: 30px;
+  width: 30px;
+}
+
+.brush-control-modal {
+  height: 150px;
+  width: 200px;
+  z-index: 1;
+  background-color: #fff;
+  position: fixed;
+  transform: translate(20px, calc(-40px + -150px - 12px));
+  border-radius: 5px;
+  box-shadow: 0 2px 4px -1px #0003, 0 4px 5px #00000024, 0 1px 10px #0000001f;
+  padding: 5px;
+  background-image: linear-gradient(
+    to right,
+    #a0a3d4,
+    #8a8dbf,
+    #7478ab,
+    #6b71ab
+  );
+}
+
+.stroke-width {
+  background-color: #edeeff;
+  border-radius: 5px;
+  padding: 5px;
+}
+.stroke-width .title {
+  display: grid;
+  grid-template-columns: 128px auto;
+  justify-items: center;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.stroke-width .title p {
+  width: -moz-fit-content;
+  width: fit-content;
+}
+
+.stroke-width .control {
+  display: flex;
+}
+
+mat-slider-visual-thumb .mat-ripple.mat-mdc-focus-indicator {
+  height: 0;
+  width: 0;
+}
+mat-slider-visual-thumb .mdc-slider__thumb-knob {
+  width: 20px;
+  height: 20px;
+}
+
+mat-slider-visual-thumb .mdc-slider__thumb-knob,
+mat-slider .mdc-slider__track--active_fill {
+  border-color: #000 !important;
+}
+
+mat-slider .mdc-slider__track--inactive {
+  background-color: #767687 !important;
+}

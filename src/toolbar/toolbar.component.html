@@ -1,0 +1,18 @@
+<div class="toolbar-container">
+  <div class="colour-selector">
+    @defer (on idle) {
+      <ngx-colors
+        ngx-colors-trigger
+        colorsAnimation="popup"
+        [ngModel]="colour"
+        (change)="setNewColour($event)"
+      />
+    }
+  </div>
+  <div class="brush-control">
+    <app-brush-control [colour]="colourSignal()" [strokeWidth]="strokeWidth()"/>
+  </div>
+  <div class="mode-toggle">
+    <button (click)="setCursorMode()">{{ cursorMode() }}</button>
+  </div>
+</div>
