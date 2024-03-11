@@ -14,3 +14,45 @@
 .toolbar-container > div {
   padding-right: 3vw;
 }
+
+::ng-deep ngx-colors-panel {
+  .opened {
+    .background-fade-alt() !important;
+
+    .colors {
+      background-color: #edeeff;
+      border-radius: 5px;
+      justify-content: space-between;
+
+      .circle.wrapper.color,
+      .circle.button {
+        margin: 3px !important;
+      }
+    }
+
+    .manual-input-wrapper {
+      p {
+        font-size: 16px !important;
+        font-family: Roboto, sans-serif;
+      }
+
+      input[type="text"] {
+        background-color: #edeeff;
+        font-size: 14px !important;
+        font-family: Roboto, sans-serif;
+      }
+    }
+
+    .nav-wrapper {
+      button {
+        font-family: Roboto, sans-serif !important;
+        font-size: 16px !important;
+        background-color: #edeeff !important;
+
+        &:last-of-type {
+          margin-right: 2px;
+        }
+      }
+    }
+  }
+}

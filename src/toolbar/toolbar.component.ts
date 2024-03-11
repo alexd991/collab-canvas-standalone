@@ -1,4 +1,4 @@
-import { Component, Signal, inject } from '@angular/core';
+import { Component, Signal, ViewEncapsulation, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgxColorsModule } from 'ngx-colors';
 import { FormsModule } from '@angular/forms';
@@ -12,6 +12,7 @@ import { BrushControlComponent } from './brush-control/brush-control.component';
   templateUrl: './toolbar.component.html',
   styleUrl: './toolbar.component.less',
   standalone: true,
+  // encapsulation: ViewEncapsulation.None,
   imports: [
     CommonModule,
     FormsModule,

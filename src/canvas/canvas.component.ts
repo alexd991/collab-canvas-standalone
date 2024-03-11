@@ -80,8 +80,8 @@ export class CanvasComponent {
     this._subscriptions.add(
       fromEvent(this._window, 'resize').pipe(debounceTime(100)).subscribe(() => {
         const imageData = canvasContext.getImageData(0, 0, this._canvas().width, this._canvas().height);
-        this._canvas().height = Math.floor(this._window.innerHeight * 767 / 911);
-        this._canvas().width = Math.floor(this._window.innerWidth * 0.98);
+        this._canvas().height = Math.floor((this._document.activeElement!.clientHeight - 128) * 0.98);
+        this._canvas().width = Math.floor(this._document.activeElement!.clientWidth * 0.98);
 
         canvasContext.lineCap = 'round';
         canvasContext.lineJoin = 'round';
