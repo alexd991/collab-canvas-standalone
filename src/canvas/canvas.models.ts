@@ -11,4 +11,7 @@ export type MousePositionData = {
 export enum CursorMode {
   Brush = 'Brush',
   Fill = 'Fill',
+  Rubber = 'Rubber',
 }
+
+export type CursorModeUrl = "../../assets/paintbrush.svg" | "../../assets/paintcan.svg";

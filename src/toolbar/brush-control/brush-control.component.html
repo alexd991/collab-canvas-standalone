@@ -5,7 +5,7 @@
 <div class="brush-control-modal">
   <div class="stroke-width">
     <div class="title">
-      Brush Width
+      {{ cursorMode() }} Width
       <span class="value"
         ><strong>{{ strokeWidth() }}</strong></span
       >
@@ -27,6 +27,16 @@
           [attr.fill]="colour()"
         />
       </svg>
+    </div>
+  </div>
+  <div class="mode-selector">
+    <div class="control">
+      <button type="button" class="icon brush" [ngClass]="{'selected': brushMode()}" (click)="setNewCursorMode(CursorMode.Brush)">
+        <img src="../../assets/paintbrush.svg" alt="draw" class="brush" />
+      </button>
+      <button type="button" class="icon rubber" [ngClass]="{'selected': rubberMode()}" (click)="setNewCursorMode(CursorMode.Rubber)">
+        <img src="../../assets/rubber.svg" alt="erase" class="rubber" />
+      </button>
     </div>
   </div>
 </div>

@@ -19,4 +19,5 @@ export class ToolbarComponent {
 
   protected colour = this._canvasControl.colour;
   protected strokeWidth = this._canvasControl.strokeWidth;
+  protected cursorMode = this._canvasControl.cursorMode;
 }

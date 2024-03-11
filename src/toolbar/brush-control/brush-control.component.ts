@@ -1,6 +1,7 @@
 import { Component, ElementRef, HostListener, ViewEncapsulation, computed, inject, input, model, signal } from '@angular/core';
 import { MatSliderModule } from '@angular/material/slider';
 import { CommonModule } from '@angular/common';
+import { CursorMode } from '../../canvas/canvas.models';
 
 @Component({
   selector: 'app-brush-control',
@@ -14,10 +15,16 @@ import { CommonModule } from '@angular/common';
   ],
 })
 export class BrushControlComponent {
+  public CursorMode = CursorMode;
+
   public colour = input.required<string>();
   public strokeWidth = model.required<number>();
-  public halfStrokeRadius = computed(() => this.strokeWidth() / 4);
+  public cursorMode = model.required<CursorMode>();
+
   public showModal = signal(false);
+  public halfStrokeRadius = computed(() => this.strokeWidth() / 4);
+  public brushMode = computed(() => this.cursorMode() === CursorMode.Brush);
+  public rubberMode = computed(() => this.cursorMode() === CursorMode.Rubber);
 
   private readonly _elRef = inject(ElementRef);
 
@@ -34,5 +41,9 @@ export class BrushControlComponent {
 
   protected setNewStrokeWidth(inputEvent: Event): void {
     this.strokeWidth.set(Number((inputEvent.target as HTMLInputElement).value));
+  }
+
+  protected setNewCursorMode(newMode: CursorMode): void {
+    this.cursorMode.set(newMode);
   }
 }
