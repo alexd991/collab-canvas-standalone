@@ -1,7 +1,7 @@
 import { Component, ElementRef, HostListener, ViewEncapsulation, computed, inject, input, model, signal } from '@angular/core';
 import { MatSliderModule } from '@angular/material/slider';
 import { CommonModule } from '@angular/common';
-import { CursorMode, CursorModeUrl } from '../../canvas/canvas.models';
+import { CursorMode, CursorModeUrl } from '../../../canvas';
 
 @Component({
   selector: 'app-brush-control',

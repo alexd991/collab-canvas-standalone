@@ -1,9 +1,9 @@
 import { DOCUMENT } from '@angular/common';
 import { ChangeDetectionStrategy, Component, ElementRef, Inject, Signal, computed, viewChild } from '@angular/core';
 import { Subscription, debounceTime, fromEvent, map, pairwise, startWith, switchMap, takeUntil } from 'rxjs';
-import { CanvasControlService } from '../canvas-control/canvas-control.service';
-import { MousePositionData } from './canvas.models';
-import { WINDOW } from '../tokens/window.token';
+import { CanvasControlService } from './canvas-control.service';
+import { CursorMode, MousePositionData } from './canvas.models';
+import { WINDOW } from '../../tokens/window.token';
 
 @Component({
   selector: 'app-canvas',
@@ -33,13 +33,12 @@ export class CanvasComponent {
   }
 
   private initialiseDrawEvents(): void {
-    const canvasContext = this._canvas().getContext('2d', { alpha: false, willReadFrequently: true })!;
+    const canvasContext = this._canvas().getContext('2d', { alpha: true, willReadFrequently: true })!;
     canvasContext.lineCap = 'round';
     canvasContext.lineJoin = 'round';
     canvasContext.lineWidth = this._canvasControl.strokeWidth();
     canvasContext.strokeStyle = this._canvasControl.colour();
-    canvasContext.fillStyle = 'white';
-    canvasContext.fillRect(0, 0, this._canvas().width, this._canvas().height);
+    this.clearCanvas(canvasContext);
 
     const mouseDown$ = fromEvent<MouseEvent>(this._canvas(), 'pointerdown');
     const mouseUp$ = fromEvent<MouseEvent>(this._document, 'pointerup');
@@ -71,8 +70,10 @@ export class CanvasComponent {
           switchMap(() => mousePositionData$.pipe(takeUntil(mouseUp$)))
         )
         .subscribe((mousePosData) => {
-          canvasContext.lineWidth = this._canvasControl.strokeWidth();;
-          canvasContext.strokeStyle = this._canvasControl.colour();
+          canvasContext.lineWidth = this._canvasControl.strokeWidth();
+          canvasContext.strokeStyle = this._canvasControl.cursorMode() === CursorMode.Brush
+            ? this._canvasControl.colour()
+            : this._canvasControl.rubberColour;
 
           this.drawBrushStroke(canvasContext, mousePosData);
         })
@@ -81,17 +82,15 @@ export class CanvasComponent {
     this._subscriptions.add(
       fromEvent(this._window, 'resize').pipe(debounceTime(100)).subscribe(() => {
         const imageData = canvasContext.getImageData(0, 0, this._canvas().width, this._canvas().height);
+
         this._canvas().height = Math.floor((this._document.activeElement!.clientHeight - 128) * 0.98);
         this._canvas().width = Math.floor(this._document.activeElement!.clientWidth * 0.98);
 
-        canvasContext.fillStyle = 'white';
-        canvasContext.fillRect(0, 0, this._canvas().width, this._canvas().height);
+        this.clearCanvas(canvasContext);
         canvasContext.lineCap = 'round';
         canvasContext.lineJoin = 'round';
 
-        if (imageData) {
-          canvasContext.putImageData(imageData, 0, 0);
-        }
+        canvasContext.putImageData(imageData, 0, 0);
       })
     );
 

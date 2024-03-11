@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { CanvasControlService } from '../canvas-control/canvas-control.service';
-import { BrushControlComponent } from './brush-control/brush-control.component';
-import { ColourSelectorComponent } from './colour-selector/colour-selector.component';
+import { CanvasControlService } from '../canvas';
+import { BrushControlComponent, ColourSelectorComponent } from './tools';
 
 @Component({
   selector: 'app-toolbar',

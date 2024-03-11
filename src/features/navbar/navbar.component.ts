@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { CanvasControlService } from '../canvas-control/canvas-control.service';
+import { CanvasControlService } from '../canvas';
 
 @Component({
   selector: 'app-navbar',
