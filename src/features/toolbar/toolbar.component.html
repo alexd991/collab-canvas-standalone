@@ -3,6 +3,10 @@
     <app-colour-selector [(colour)]="colour"></app-colour-selector>
   </div>
   <div class="brush-control">
-    <app-brush-control [colour]="colour()" [(strokeWidth)]="strokeWidth" [(cursorMode)]="cursorMode"/>
+    <app-brush-control
+      [colour]="colour()"
+      [(strokeWidth)]="strokeWidth"
+      [(cursorMode)]="cursorMode"
+    />
   </div>
 </div>

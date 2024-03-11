@@ -10,7 +10,7 @@ import { BrushControlComponent, ColourSelectorComponent } from './tools';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     ColourSelectorComponent,
-    BrushControlComponent
+    BrushControlComponent,
   ],
 })
 export class ToolbarComponent {

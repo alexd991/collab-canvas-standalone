@@ -33,7 +33,7 @@ export class CanvasComponent {
   }
 
   private initialiseDrawEvents(): void {
-    const canvasContext = this._canvas().getContext('2d', { alpha: true, willReadFrequently: true })!;
+    const canvasContext = this._canvas().getContext('2d', { alpha: false, willReadFrequently: true })!;
     canvasContext.lineCap = 'round';
     canvasContext.lineJoin = 'round';
     canvasContext.lineWidth = this._canvasControl.strokeWidth();

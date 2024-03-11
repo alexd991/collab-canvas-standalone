@@ -8,6 +8,9 @@ import { NgxColorsModule } from 'ngx-colors';
     <ngx-colors
       ngx-colors-trigger
       colorsAnimation="popup"
+      colorPickerControls="no-alpha"
+      acceptLabel="Accept"
+      cancelLabel="Cancel"
       [ngModel]="colour()"
       (change)="setNewColour($event)"
     />
@@ -22,11 +25,10 @@ import { NgxColorsModule } from 'ngx-colors';
 export class ColourSelectorComponent {
   public colour = model.required<string>();
 
-  ngAfterViewInit(): void {
-    this.colour.set('#000000');
-  }
-
   protected setNewColour(hexCode: string): void {
+    if(!hexCode)
+      return;
+
     this.colour.set(hexCode);
   }
 }

@@ -1,6 +1,6 @@
 @import "./colours.less";
 
-.background-fade-to-right() {
+.background-fade-full() {
   background-image: linear-gradient(to right,
     @gradient-base-green, #005646, #006a68,
     #007d8b, #338fac, #3f8caf,
@@ -9,15 +9,23 @@
   );
 }
 
-.background-fade-alt() {
+.background-fade-modal() {
   background-image: linear-gradient(
     to right, @gradient-base-green, #003f39,
     #003a49, #003350, @gradient-base-blue
   );
 }
 
+// .background-transparent() {
+//   background-image: linear-gradient(45deg,#ccc 25%,transparent 25%),
+//     linear-gradient(-45deg,#ccc 25%,transparent 25%),
+//     linear-gradient(45deg,transparent 75%,#ccc 75%),
+//     linear-gradient(-45deg,transparent 75%,#ccc 75%);
+//   background-size: 32px 32px;
+//   background-position: 0 0, 0 16px, 16px -16px, -16px 0;
+// }
 
-.full-size() {
+.full-size-host() {
   :host {
     display: flex;
     height: 100%;
@@ -25,16 +33,27 @@
   }
 }
 
-.margin(@margin: 0px) {
+.font-override(@fontSize: 14px, @colour: @text-base) {
+  font-family: Roboto, sans-serif !important;
+  font-size: @fontSize !important;
+  color: @colour !important;
+}
+
+.margin-override(@margin: 0px) {
   margin: @margin !important;
 }
 
-.font(@fontSize: 14px) {
-  font-family: Roboto, sans-serif !important;
-  font-size: @fontSize !important;
+.svg-override() {
+  svg {
+    cursor: pointer;
+    fill: @text-base !important;
+    .hover-white-text(fill);
+  }
 }
 
 .hover-white-text(@colorOrFill: color) {
+  cursor: pointer;
+
   &:hover {
     @{colorOrFill}: @text-bright !important;
   }

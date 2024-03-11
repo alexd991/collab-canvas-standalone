@@ -21,11 +21,12 @@ export class BrushControlComponent {
   public readonly strokeWidth = model.required<number>();
   public readonly cursorMode = model.required<CursorMode>();
 
-  public readonly showModal = signal(false);
   public readonly halfStrokeRadius = computed(() => this.strokeWidth() / 4);
   public readonly brushMode = computed(() => this.cursorMode() === CursorMode.Brush);
   public readonly rubberMode = computed(() => this.cursorMode() === CursorMode.Rubber);
-  public readonly iconUrl = computed<CursorModeUrl>(() => this.brushMode() ? CursorModeUrl.Brush : CursorModeUrl.Rubber);
+  public readonly iconUrl = computed(() => this.brushMode() ? CursorModeUrl.Brush : CursorModeUrl.Rubber);
+
+  public readonly showModal = signal(false);
 
   private readonly _elRef = inject(ElementRef);
 
