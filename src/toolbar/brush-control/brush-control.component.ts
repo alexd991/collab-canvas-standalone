@@ -1,7 +1,7 @@
 import { Component, ElementRef, HostListener, ViewEncapsulation, computed, inject, input, model, signal } from '@angular/core';
 import { MatSliderModule } from '@angular/material/slider';
 import { CommonModule } from '@angular/common';
-import { CursorMode } from '../../canvas/canvas.models';
+import { CursorMode, CursorModeUrl } from '../../canvas/canvas.models';
 
 @Component({
   selector: 'app-brush-control',
@@ -15,16 +15,17 @@ import { CursorMode } from '../../canvas/canvas.models';
   ],
 })
 export class BrushControlComponent {
-  public CursorMode = CursorMode;
+  public readonly CursorMode = CursorMode;
 
-  public colour = input.required<string>();
-  public strokeWidth = model.required<number>();
-  public cursorMode = model.required<CursorMode>();
+  public readonly colour = input.required<string>();
+  public readonly strokeWidth = model.required<number>();
+  public readonly cursorMode = model.required<CursorMode>();
 
-  public showModal = signal(false);
-  public halfStrokeRadius = computed(() => this.strokeWidth() / 4);
-  public brushMode = computed(() => this.cursorMode() === CursorMode.Brush);
-  public rubberMode = computed(() => this.cursorMode() === CursorMode.Rubber);
+  public readonly showModal = signal(false);
+  public readonly halfStrokeRadius = computed(() => this.strokeWidth() / 4);
+  public readonly brushMode = computed(() => this.cursorMode() === CursorMode.Brush);
+  public readonly rubberMode = computed(() => this.cursorMode() === CursorMode.Rubber);
+  public readonly iconUrl = computed<CursorModeUrl>(() => this.brushMode() ? CursorModeUrl.Brush : CursorModeUrl.Rubber);
 
   private readonly _elRef = inject(ElementRef);
 

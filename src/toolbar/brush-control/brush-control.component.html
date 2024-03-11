@@ -1,5 +1,5 @@
 <a class="icon brush" (click)="onClickOnIcon()">
-  <img src="../../assets/paintbrush.svg" alt="paintbrush" />
+  <img [src]="iconUrl()" alt="paintbrush" />
 </a>
 @if (showModal()) {
 <div class="brush-control-modal">

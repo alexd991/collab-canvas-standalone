@@ -13,5 +13,8 @@ export enum CursorMode {
   Fill = 'Fill',
   Rubber = 'Rubber',
 }
-
-export type CursorModeUrl = "../../assets/paintbrush.svg" | "../../assets/paintcan.svg";
+export enum CursorModeUrl {
+  Brush = '../../assets/paintbrush.svg',
+  Fill = '../../assets/paintcan.svg',
+  Rubber = '../../assets/rubber.svg',
+}
