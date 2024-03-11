@@ -33,6 +33,17 @@
   }
 }
 
+.bar-sizing() {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0 4vw;
+}
+
+.modal-transform() {
+  transform: translateY(calc(-100% - 40px));
+}
+
 .font-override(@fontSize: 14px, @colour: @text-base) {
   font-family: Roboto, sans-serif !important;
   font-size: @fontSize !important;
@@ -57,4 +68,14 @@
   &:hover {
     @{colorOrFill}: @text-bright !important;
   }
+}
+
+.brush-control-panel() {
+  background-color: @gradient-base-blue;
+  border-radius: 5px;
+  padding: 5px;
+}
+
+.border-colour() {
+  border-color: #000 !important;
 }

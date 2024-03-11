@@ -3,12 +3,8 @@
 .full-size-host();
 
 .nav {
-  display: flex;
-  align-items: center;
+  .bar-sizing();
   justify-content: space-between;
-  height: 64px;
-  width: 100%;
-  padding: 0 5%;
 
   .icon {
     flex-basis: 32px;
@@ -21,13 +17,7 @@
     }
 
     &.clear-canvas {
-      color: #edeeff;
       cursor: pointer;
     }
-  }
-
-  .text {
-    font: normal 24px/32px Roboto;
-    vertical-align: baseline;
   }
 }

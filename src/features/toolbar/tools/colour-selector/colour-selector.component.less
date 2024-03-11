@@ -3,6 +3,7 @@
 ::ng-deep ngx-colors-panel {
   .opened {
     .background-fade-modal() !important;
+    .modal-transform() !important;
 
     .colors {
       background-color: @gradient-base-blue;
@@ -64,6 +65,10 @@
           margin-right: 2px;
         }
       }
+    }
+
+    .color-picker-wrapper .color-picker .hue-alpha.box .selected-color{
+      border: 2px solid #fff;
     }
   }
 }
