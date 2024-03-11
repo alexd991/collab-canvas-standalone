@@ -1,15 +1,17 @@
+@import "../../styles//mixins.less";
+
 .icon {
   display: block;
   height: 30px;
-}
 
-.icon.brush:hover {
-  cursor: pointer;
-}
+  &.brush:hover {
+    cursor: pointer;
+  }
 
-.icon img {
-  height: 30px;
-  width: 30px;
+  img {
+    height: 30px;
+    width: 30px;
+  }
 }
 
 .brush-control-panel() {
@@ -32,13 +34,7 @@
   border-radius: 5px;
   box-shadow: 0 2px 4px -1px #0003, 0 4px 5px #00000024, 0 1px 10px #0000001f;
   padding: 5px;
-  background-image: linear-gradient(
-    to right,
-    #a0a3d4,
-    #8a8dbf,
-    #7478ab,
-    #6b71ab
-  );
+  .background-fade-alt();
 
   .stroke-width {
     background-color: #edeeff;

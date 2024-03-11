@@ -33,11 +33,13 @@ export class CanvasComponent {
   }
 
   private initialiseDrawEvents(): void {
-    const canvasContext = this._canvas().getContext('2d', { alpha: true, willReadFrequently: true })!;
+    const canvasContext = this._canvas().getContext('2d', { alpha: false, willReadFrequently: true })!;
     canvasContext.lineCap = 'round';
     canvasContext.lineJoin = 'round';
     canvasContext.lineWidth = this._canvasControl.strokeWidth();
     canvasContext.strokeStyle = this._canvasControl.colour();
+    canvasContext.fillStyle = 'white';
+    canvasContext.fillRect(0, 0, this._canvas().width, this._canvas().height);
 
     const mouseDown$ = fromEvent<MouseEvent>(this._canvas(), 'pointerdown');
     const mouseUp$ = fromEvent<MouseEvent>(this._document, 'pointerup');
@@ -82,6 +84,8 @@ export class CanvasComponent {
         this._canvas().height = Math.floor((this._document.activeElement!.clientHeight - 128) * 0.98);
         this._canvas().width = Math.floor(this._document.activeElement!.clientWidth * 0.98);
 
+        canvasContext.fillStyle = 'white';
+        canvasContext.fillRect(0, 0, this._canvas().width, this._canvas().height);
         canvasContext.lineCap = 'round';
         canvasContext.lineJoin = 'round';
 
@@ -113,6 +117,7 @@ export class CanvasComponent {
   }
 
   private clearCanvas(canvasContext: CanvasRenderingContext2D): void {
-    canvasContext.clearRect(0, 0, this._canvas().width, this._canvas().height);
+    canvasContext.fillStyle = 'white';
+    canvasContext.fillRect(0, 0, this._canvas().width, this._canvas().height);
   }
 }
