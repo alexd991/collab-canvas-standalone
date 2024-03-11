@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import {  } from'@angular/animations';
 import { ToolbarComponent } from '../toolbar/toolbar.component';
 import { CanvasComponent } from '../canvas/canvas.component';
 import { NavbarComponent } from '../navbar/navbar.component';
@@ -16,5 +15,4 @@ import { NavbarComponent } from '../navbar/navbar.component';
     NavbarComponent,
   ],
 })
-export class AppComponent {
-}
+export class AppComponent { }

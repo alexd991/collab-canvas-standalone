@@ -1,6 +1,5 @@
 import { Injectable, signal } from '@angular/core';
 import { Subject } from 'rxjs';
-import { CursorMode } from '../canvas/canvas.models'
 
 @Injectable({ providedIn: 'root' })
 export class CanvasControlService {
@@ -8,7 +7,6 @@ export class CanvasControlService {
 
   public readonly colour = signal('#000000');
   public readonly strokeWidth = signal(10);
-  public readonly cursorMode = signal(CursorMode.Brush);
   public readonly clearCanvas$ = this._clearCanvasSubject.asObservable();
 
   public clearCanvas(): void {

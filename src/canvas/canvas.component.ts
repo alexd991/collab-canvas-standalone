@@ -1,8 +1,8 @@
 import { DOCUMENT } from '@angular/common';
-import { ChangeDetectionStrategy, Component, ElementRef, Inject, Signal, computed, inject, viewChild } from '@angular/core';
-import { Subscription, debounceTime, filter, fromEvent, map, pairwise, startWith, switchMap, takeUntil } from 'rxjs';
+import { ChangeDetectionStrategy, Component, ElementRef, Inject, Signal, computed, viewChild } from '@angular/core';
+import { Subscription, debounceTime, fromEvent, map, pairwise, startWith, switchMap, takeUntil } from 'rxjs';
 import { CanvasControlService } from '../canvas-control/canvas-control.service';
-import { CursorMode, MousePositionData } from './canvas.models';
+import { MousePositionData } from './canvas.models';
 import { WINDOW } from '../tokens/window.token';
 
 @Component({
@@ -66,7 +66,6 @@ export class CanvasComponent {
     this._subscriptions.add(
       mouseDown$
         .pipe(
-          filter(() => this._canvasControl.cursorMode() === CursorMode.Brush),
           switchMap(() => mousePositionData$.pipe(takeUntil(mouseUp$)))
         )
         .subscribe((mousePosData) => {

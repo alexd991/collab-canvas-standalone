@@ -1,10 +1,5 @@
-import { ChangeDetectionStrategy, Component, Signal, ViewEncapsulation, WritableSignal, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { NgxColorsModule } from 'ngx-colors';
-import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { CanvasControlService } from '../canvas-control/canvas-control.service';
-import { CursorMode } from '../canvas/canvas.models';
 import { BrushControlComponent } from './brush-control/brush-control.component';
 import { ColourSelectorComponent } from './colour-selector/colour-selector.component';
 
@@ -24,5 +19,4 @@ export class ToolbarComponent {
 
   protected colour = this._canvasControl.colour;
   protected strokeWidth = this._canvasControl.strokeWidth;
-  protected cursorMode = this._canvasControl.cursorMode;
 }
