@@ -1,4 +1,4 @@
-<a class="icon brush" (click)="onClickOnIcon()">
+<a class="icon brush" (click)="onClickOnIcon()" title="Brush Control">
   <img [src]="iconUrl()" alt="paintbrush" />
 </a>
 @if (showModal()) {
@@ -34,10 +34,10 @@
   <div class="mode-selector">
     <div class="control">
       <button type="button" class="icon brush" [ngClass]="{'selected': brushMode()}" (click)="setNewCursorMode(CursorMode.Brush)">
-        <img src="../../assets/paintbrush.svg" alt="draw" class="brush" />
+        <img src="../../assets/paintbrush.svg" alt="Brush" class="brush" />
       </button>
       <button type="button" class="icon rubber" [ngClass]="{'selected': rubberMode()}" (click)="setNewCursorMode(CursorMode.Rubber)">
-        <img src="../../assets/rubber.svg" alt="erase" class="rubber" />
+        <img src="../../assets/rubber.svg" alt="Rubber" class="rubber" />
       </button>
     </div>
   </div>

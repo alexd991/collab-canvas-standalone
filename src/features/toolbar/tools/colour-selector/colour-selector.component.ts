@@ -13,6 +13,7 @@ import { NgxColorsModule } from 'ngx-colors';
       cancelLabel="Cancel"
       [ngModel]="colour()"
       (change)="setNewColour($event)"
+      title="Colour Selector"
     />
   `,
   styleUrl: './colour-selector.component.less',
