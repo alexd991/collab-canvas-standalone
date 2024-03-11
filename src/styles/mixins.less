@@ -1,20 +1,19 @@
-.background-fade() {
-  background-image: linear-gradient(
-    to right,
-    #ced1ff, #b7bae9, #a0a3d4,
-    #8a8dbf, #7478ab, #6b71ab,
-    #616aab, #5663ab, #5368bf,
-    #4e6dd4, #4572e9, #3777ff
+@import "./colours.less";
+
+.background-fade-to-right() {
+  background-image: linear-gradient(to right,
+    @gradient-base-green, #005646, #006a68,
+    #007d8b, #338fac, #3f8caf,
+    #4c88b0, #5984af, #476c95,
+    #36557c, #253f64, @gradient-base-blue
   );
 }
 
 .background-fade-alt() {
   background-image: linear-gradient(
-    to right,
-    #a0a3d4,
-    #8a8dbf,
-    #7478ab,
-    #6b71ab)
+    to right, @gradient-base-green, #003f39,
+    #003a49, #003350, @gradient-base-blue
+  );
 }
 
 
@@ -23,5 +22,20 @@
     display: flex;
     height: 100%;
     width: 100%;
+  }
+}
+
+.margin(@margin: 0px) {
+  margin: @margin !important;
+}
+
+.font(@fontSize: 14px) {
+  font-family: Roboto, sans-serif !important;
+  font-size: @fontSize !important;
+}
+
+.hover-white-text(@colorOrFill: color) {
+  &:hover {
+    @{colorOrFill}: @text-bright !important;
   }
 }
