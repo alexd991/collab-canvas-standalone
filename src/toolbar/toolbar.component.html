@@ -1,15 +1,8 @@
 <div class="toolbar-container">
   <div class="colour-selector">
-    @defer (on idle) {
-      <ngx-colors
-        ngx-colors-trigger
-        colorsAnimation="popup"
-        [ngModel]="colour"
-        (change)="setNewColour($event)"
-      />
-    }
+    <app-colour-selector [(colour)]="colour"></app-colour-selector>
   </div>
   <div class="brush-control">
-    <app-brush-control [colour]="colourSignal()" [strokeWidth]="strokeWidth()"/>
+    <app-brush-control [colour]="colour()" [(strokeWidth)]="strokeWidth"/>
   </div>
 </div>

@@ -1,7 +1,6 @@
-import { Component, ElementRef, HostListener, Signal, ViewEncapsulation, computed, input, signal } from '@angular/core';
+import { Component, ElementRef, HostListener, ViewEncapsulation, computed, inject, input, model, signal } from '@angular/core';
 import { MatSliderModule } from '@angular/material/slider';
 import { CommonModule } from '@angular/common';
-import { CanvasControlService } from '../../canvas-control/canvas-control.service';
 
 @Component({
   selector: 'app-brush-control',
@@ -15,17 +14,12 @@ import { CanvasControlService } from '../../canvas-control/canvas-control.servic
   ],
 })
 export class BrushControlComponent {
-  public showModal = signal(false);
-  public strokeWidth = input.required<number>();
   public colour = input.required<string>();
-  protected halfStrokeRadius: Signal<number>;
+  public strokeWidth = model.required<number>();
+  public halfStrokeRadius = computed(() => this.strokeWidth() / 4);
+  public showModal = signal(false);
 
-  constructor(
-    private readonly _elRef: ElementRef,
-    private readonly _canvasControl: CanvasControlService
-  ) {
-    this.halfStrokeRadius = computed(() => this.strokeWidth() / 4);
-  }
+  private readonly _elRef = inject(ElementRef);
 
   @HostListener('document:mousedown', ['$event'])
   public onClickOutsideModal(event: Event): void {
@@ -39,7 +33,6 @@ export class BrushControlComponent {
   }
 
   protected setNewStrokeWidth(inputEvent: Event): void {
-    const sliderValue = Number((inputEvent.target as HTMLInputElement).value);
-    this._canvasControl.setStrokeWidth(sliderValue);
+    this.strokeWidth.set(Number((inputEvent.target as HTMLInputElement).value));
   }
 }

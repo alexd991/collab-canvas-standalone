@@ -1,6 +1,6 @@
 import { DOCUMENT } from '@angular/common';
-import { ChangeDetectionStrategy, Component, ElementRef, Inject, Signal, computed, viewChild } from '@angular/core';
-import { Subscription, debounceTime, filter, fromEvent, map, pairwise, startWith, switchMap, takeUntil, tap } from 'rxjs';
+import { ChangeDetectionStrategy, Component, ElementRef, Inject, Signal, computed, inject, viewChild } from '@angular/core';
+import { Subscription, debounceTime, filter, fromEvent, map, pairwise, startWith, switchMap, takeUntil } from 'rxjs';
 import { CanvasControlService } from '../canvas-control/canvas-control.service';
 import { CursorMode, MousePositionData } from './canvas.models';
 import { WINDOW } from '../tokens/window.token';
@@ -13,7 +13,7 @@ import { WINDOW } from '../tokens/window.token';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CanvasComponent {
-  private _canvasElRef = viewChild.required<ElementRef<HTMLCanvasElement>>('canvas');
+  private readonly _canvasElRef = viewChild.required<ElementRef<HTMLCanvasElement>>('canvas');
   private _canvas!: Signal<HTMLCanvasElement>;
   private readonly _subscriptions: Subscription = new Subscription();
 

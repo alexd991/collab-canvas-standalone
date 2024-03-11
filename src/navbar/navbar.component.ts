@@ -1,5 +1,4 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { CanvasControlService } from '../canvas-control/canvas-control.service';
 
 @Component({
@@ -7,7 +6,7 @@ import { CanvasControlService } from '../canvas-control/canvas-control.service';
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.less',
   standalone: true,
-  imports: [CommonModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NavbarComponent {
   constructor(
