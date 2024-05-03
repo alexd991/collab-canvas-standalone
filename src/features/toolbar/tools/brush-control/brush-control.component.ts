@@ -16,6 +16,7 @@ import { CursorMode, CursorModeUrl } from '../../../canvas';
 })
 export class BrushControlComponent {
   public readonly CursorMode = CursorMode;
+  public readonly CursorModeUrl = CursorModeUrl;
 
   public readonly colour = input.required<string>();
   public readonly strokeWidth = model.required<number>();
