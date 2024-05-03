@@ -6,12 +6,9 @@ export class CanvasHistoryService {
 
   public addSnapshot(snapshot: ImageData): void {
     this._canvasSnapshotHistory.push(snapshot);
-    console.log(this._canvasSnapshotHistory);
   }
 
   public getLastSnapshot(): ImageData | undefined {
     return this._canvasSnapshotHistory.pop();
-    console.log(this._canvasSnapshotHistory);
   }
-
 }

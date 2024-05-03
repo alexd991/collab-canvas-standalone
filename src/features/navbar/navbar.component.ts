@@ -9,15 +9,15 @@ import { CanvasControlService } from '../canvas';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NavbarComponent {
-  constructor(
+  public constructor(
     private readonly _canvasControl: CanvasControlService,
   ) { }
 
-  clearCanvas(): void {
+  public clearCanvas(): void {
     this._canvasControl.clearCanvas();
   }
 
-  undo(): void {
+  public undo(): void {
     this._canvasControl.undo();
   }
 }

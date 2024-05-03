@@ -18,7 +18,7 @@ export class CanvasComponent {
   private _canvas!: HTMLCanvasElement;
   private readonly _subscriptions = new Subscription();
 
-  constructor(
+  public constructor(
     private readonly _elRef: ElementRef,
     private readonly _canvasControl: CanvasControlService,
     private readonly _canvasHistory: CanvasHistoryService,
@@ -26,12 +26,16 @@ export class CanvasComponent {
     @Inject(WINDOW) private readonly _window: Window
   ) { }
 
-  ngAfterViewInit() {
+  public ngAfterViewInit() {
     this._canvas = this._canvasElRef().nativeElement;
     this._canvas.height = Math.floor(this._elRef.nativeElement.clientHeight);
     this._canvas.width = Math.floor(this._elRef.nativeElement.clientWidth);
 
     this.initialiseDrawEvents();
+  }
+
+  public ngOnDestroy() {
+    this._subscriptions.unsubscribe();
   }
 
   private initialiseDrawEvents(): void {
@@ -65,28 +69,6 @@ export class CanvasComponent {
     this.createSubscriptions(mouseDown$, mousePositionData$, mouseUp$, canvasContext);
   }
 
-  private drawBrushStroke(
-    canvasContext: CanvasRenderingContext2D,
-    mousePosData: MousePositionData
-  ): void {
-    const { previous, current } = mousePosData;
-
-    if (previous.x === current.x && previous.y === current.y) {
-      return;
-    }
-
-    canvasContext.beginPath();
-    canvasContext.moveTo(previous.x, previous.y);
-    canvasContext.lineTo(current.x, current.y);
-    canvasContext.closePath();
-    canvasContext.stroke();
-  }
-
-  private clearCanvas(canvasContext: CanvasRenderingContext2D): void {
-    canvasContext.fillStyle = 'white';
-    canvasContext.fillRect(0, 0, this._canvas.width, this._canvas.height);
-  }
-
   private createSubscriptions(
     mouseDown$: Observable<MouseEvent>,
     mousePositionData$: Observable<MousePositionData>,
@@ -96,7 +78,7 @@ export class CanvasComponent {
     this._subscriptions.add(
       mouseDown$
         .pipe(
-          tap(() => this._canvasHistory.addSnapshot(canvasContext.getImageData(0, 0, this._canvas.width, this._canvas.height))),
+          tap(() => this.storeSnapshot(canvasContext)),
           switchMap(() => mousePositionData$.pipe(takeUntil(mouseUp$), debounceTime(2)))
         )
         .subscribe((mousePosData) => {
@@ -151,7 +133,30 @@ export class CanvasComponent {
     this.clearCanvas(canvasContext);
   }
 
-  ngOnDestroy() {
-    this._subscriptions.unsubscribe();
+  private drawBrushStroke(
+    canvasContext: CanvasRenderingContext2D,
+    mousePosData: MousePositionData
+  ): void {
+    const { previous, current } = mousePosData;
+
+    if (previous.x === current.x && previous.y === current.y) {
+      return;
+    }
+
+    canvasContext.beginPath();
+    canvasContext.moveTo(previous.x, previous.y);
+    canvasContext.lineTo(current.x, current.y);
+    canvasContext.closePath();
+    canvasContext.stroke();
+  }
+
+  private storeSnapshot(canvasContext: CanvasRenderingContext2D): void {
+    this._canvasHistory.addSnapshot(canvasContext.getImageData(0, 0, this._canvas.width, this._canvas.height));
+  }
+
+  private clearCanvas(canvasContext: CanvasRenderingContext2D): void {
+    this.storeSnapshot(canvasContext);
+    canvasContext.fillStyle = 'white';
+    canvasContext.fillRect(0, 0, this._canvas.width, this._canvas.height);
   }
 }
