@@ -16,4 +16,8 @@ export class NavbarComponent {
   clearCanvas(): void {
     this._canvasControl.clearCanvas();
   }
+
+  undo(): void {
+    this._canvasControl.undo();
+  }
 }
