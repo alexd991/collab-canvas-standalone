@@ -2,10 +2,14 @@
   <span class="icon logo">
     <img src="../assets/pencil-rocket.svg" alt="Rocket Pencil" />
   </span>
-  <span class="icon undo" (click)="undo()" title="Undo">
-    <img src="../assets/undo.svg" alt="undo"/>
-  </span>
-  <span class="icon clear-canvas" (click)="clearCanvas()" title="Clear Canvas">
-    <img src="../assets/bin.svg" alt="bin"/>
-  </span>
+  <a (click)="undo()" title="Undo">
+    <span class="icon undo" [ngClass]="{disabled: !hasSnapshots()}">
+      <!-- <img src="../assets/undo.svg" alt="undo"/> -->
+    </span>
+  </a>
+  <a (click)="clearCanvas()" title="Clear Canvas">
+    <span class="icon clear-canvas">
+      <img src="../assets/bin.svg" alt="bin"/>
+    </span>
+  </a>
 </div>

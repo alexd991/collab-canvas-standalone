@@ -1,10 +1,9 @@
-import { DOCUMENT } from '@angular/common';
-import { ChangeDetectionStrategy, Component, ElementRef, Inject, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, Inject, effect, viewChild } from '@angular/core';
 import { Observable, Subscription, debounceTime, fromEvent, map, pairwise, startWith, switchMap, takeUntil, tap } from 'rxjs';
 import { CanvasControlService, CanvasHistoryService } from './services';
 import { CursorMode, MousePositionData } from './canvas.models';
-import { WINDOW } from '../../tokens/window.token';
-import { FooterHeight, IdealCanvasDimensionPercentage, NavbarHeight } from '../../utils';
+import { DOCUMENT, WINDOW } from '../../tokens';
+import { FOOTER_HEIGHT, IDEAL_CANVAS_DIMENSION_PCT, NAVBAR_HEIGHT, RUBBER_COLOUR } from '../../utils';
 
 @Component({
   selector: 'app-canvas',
@@ -36,8 +35,10 @@ export class CanvasComponent {
 
   private initialiseCanvas(): void {
     const canvasContext = this._canvas.getContext('2d', { alpha: false, willReadFrequently: true })!;
+
     this.setCanvasDimensions();
     this.initialiseCanvasContext(canvasContext);
+    this.fillCanvasWhite(canvasContext);
 
     const mouseDown$ = fromEvent<MouseEvent>(this._canvas, 'pointerdown');
     const mouseUp$ = fromEvent<MouseEvent>(this._document, 'pointerup');
@@ -66,14 +67,6 @@ export class CanvasComponent {
     this.createSubscriptions(mouseDown$, mousePositionData$, mouseUp$, canvasContext);
   }
 
-  private initialiseCanvasContext(canvasContext: CanvasRenderingContext2D): void {
-    canvasContext.lineCap = 'round';
-    canvasContext.lineJoin = 'round';
-    canvasContext.lineWidth = this._canvasControl.strokeWidth();
-    canvasContext.strokeStyle = this._canvasControl.colour();
-    this.clearCanvas(canvasContext);
-  }
-
   private createSubscriptions(
     mouseDown$: Observable<MouseEvent>,
     mousePositionData$: Observable<MousePositionData>,
@@ -90,7 +83,7 @@ export class CanvasComponent {
           canvasContext.lineWidth = this._canvasControl.strokeWidth();
           canvasContext.strokeStyle = this._canvasControl.cursorMode() === CursorMode.Brush
             ? this._canvasControl.colour()
-            : this._canvasControl.rubberColour;
+            : RUBBER_COLOUR;
 
           this.drawBrushStroke(canvasContext, mousePosData);
         })
@@ -103,10 +96,8 @@ export class CanvasComponent {
           const imageData = canvasContext.getImageData(0, 0, this._canvas.width, this._canvas.height);
 
           this.setCanvasDimensions();
-
-          this.clearCanvas(canvasContext);
-          canvasContext.lineCap = 'round';
-          canvasContext.lineJoin = 'round';
+          this.initialiseCanvasContext(canvasContext);
+          this.fillCanvasWhite(canvasContext);
 
           canvasContext.putImageData(imageData, 0, 0);
         })
@@ -122,7 +113,10 @@ export class CanvasComponent {
     );
 
     this._subscriptions.add(
-      this._canvasControl.clearCanvas$.subscribe(() => this.clearCanvas(canvasContext))
+      this._canvasControl.clearCanvas$.subscribe(() => {
+        this.storeCanvasSnapshot(canvasContext);
+        this.fillCanvasWhite(canvasContext);
+      })
     );
   }
 
@@ -144,17 +138,23 @@ export class CanvasComponent {
   }
 
   private setCanvasDimensions(): void {
-    this._canvas.height = Math.floor((this._document.activeElement!.clientHeight - (NavbarHeight + FooterHeight)) * IdealCanvasDimensionPercentage);
-    this._canvas.width = Math.floor(this._document.activeElement!.clientWidth * IdealCanvasDimensionPercentage);
+    this._canvas.height = (this._document.body.clientHeight - (NAVBAR_HEIGHT + FOOTER_HEIGHT)) * IDEAL_CANVAS_DIMENSION_PCT;
+    this._canvas.width = this._document.body.clientWidth * IDEAL_CANVAS_DIMENSION_PCT;
+  }
+
+  private initialiseCanvasContext(canvasContext: CanvasRenderingContext2D): void {
+    canvasContext.lineCap = 'round';
+    canvasContext.lineJoin = 'round';
+    canvasContext.lineWidth = this._canvasControl.strokeWidth();
+    canvasContext.strokeStyle = this._canvasControl.colour();
+  }
+
+  private fillCanvasWhite(canvasContext: CanvasRenderingContext2D): void {
+    canvasContext.fillStyle = 'white';
+    canvasContext.fillRect(0, 0, this._canvas.width, this._canvas.height);
   }
 
   private storeCanvasSnapshot(canvasContext: CanvasRenderingContext2D): void {
     this._canvasHistory.addSnapshot(canvasContext.getImageData(0, 0, this._canvas.width, this._canvas.height));
-  }
-
-  private clearCanvas(canvasContext: CanvasRenderingContext2D): void {
-    this.storeCanvasSnapshot(canvasContext);
-    canvasContext.fillStyle = 'white';
-    canvasContext.fillRect(0, 0, this._canvas.width, this._canvas.height);
   }
 }

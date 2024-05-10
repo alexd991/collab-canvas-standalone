@@ -1,4 +1,5 @@
-export const NavbarHeight = 64;
-export const FooterHeight = 64;
-export const IdealCanvasDimensionPercentage = 0.98;
-export const CanvasUndoBuffer = 10;
+export const NAVBAR_HEIGHT = 64;
+export const FOOTER_HEIGHT = 64;
+export const IDEAL_CANVAS_DIMENSION_PCT = 0.98;
+export const UNDO_BUFFER = 10;
+export const RUBBER_COLOUR = "#FFFFFF";

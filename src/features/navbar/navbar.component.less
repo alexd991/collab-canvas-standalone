@@ -22,9 +22,21 @@
       }
     }
 
-    &.clear-canvas,
+    &.clear-canvas {
+      cursor: pointer;
+    }
+
     &.undo {
       cursor: pointer;
+      height: 30px;
+      width: 30px;
+      content: url(../../assets/undo.svg);
+
+      &.disabled {
+        pointer-events: none;
+        cursor: not-allowed;
+        filter: brightness(0.75);
+      }
     }
   }
 }

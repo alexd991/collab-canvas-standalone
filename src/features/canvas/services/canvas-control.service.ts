@@ -14,8 +14,6 @@ export class CanvasControlService {
   public readonly strokeWidth = signal(15);
   public readonly cursorMode = signal(CursorMode.Brush);
 
-  public readonly rubberColour = "#ffffff";
-
   public clearCanvas(): void {
     this._clearCanvasSubject.next();
   }
