@@ -26,8 +26,8 @@ export class IconModalComponent {
     this._renderer.addClass(this._elRef.nativeElement, this.iconClass);
   }
 
-  public onClickOnIcon(): void {
-    this.showModal.update(() => !this.showModal());
+  public toggleModal(): void {
+    this.showModal.update((value) => !value);
   }
 
   @HostListener('document:mousedown', ['$event'])

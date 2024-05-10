@@ -1,4 +1,4 @@
-<a class="icon" [ngClass]="iconClass" (click)="onClickOnIcon()" [title]="iconTitle">
+<a class="icon" [ngClass]="iconClass" (click)="toggleModal()" [title]="iconTitle">
   <img [src]="iconUrl()" [alt]="iconAlt" title="icon" />
 </a>
 @if (showModal()) {
