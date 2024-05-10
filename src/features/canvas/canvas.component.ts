@@ -3,7 +3,7 @@ import { Observable, Subscription, debounceTime, fromEvent, map, pairwise, start
 import { CanvasControlService, CanvasHistoryService } from './services';
 import { CursorMode, MousePositionData } from './canvas.models';
 import { DOCUMENT, WINDOW } from '../../tokens';
-import { FOOTER_HEIGHT, IDEAL_CANVAS_DIMENSION_PCT, NAVBAR_HEIGHT, RUBBER_COLOUR } from '../../utils';
+import { FOOTER_HEIGHT, IDEAL_CANVAS_DIMENSION_PCT, LINE_STYLE, NAVBAR_HEIGHT, RUBBER_COLOUR } from '../../utils';
 
 @Component({
   selector: 'app-canvas',
@@ -143,8 +143,8 @@ export class CanvasComponent {
   }
 
   private initialiseCanvasContext(canvasContext: CanvasRenderingContext2D): void {
-    canvasContext.lineCap = 'round';
-    canvasContext.lineJoin = 'round';
+    canvasContext.lineCap = LINE_STYLE;
+    canvasContext.lineJoin = LINE_STYLE;
     canvasContext.lineWidth = this._canvasControl.strokeWidth();
     canvasContext.strokeStyle = this._canvasControl.colour();
   }

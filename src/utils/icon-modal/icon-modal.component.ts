@@ -8,7 +8,7 @@ import { hostAttribute } from '../host-attribute';
   templateUrl: './icon-modal.component.html',
   styleUrl: './icon-modal.component.less',
   imports: [CommonModule],
-  encapsulation: ViewEncapsulation.None,
+  encapsulation: ViewEncapsulation.ShadowDom,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IconModalComponent {
