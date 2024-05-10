@@ -48,19 +48,10 @@ export class CanvasComponent {
         y: Math.floor(event.clientY - this._canvas.getBoundingClientRect().top),
       })),
       pairwise(),
-      map(([prev, curr]) => ({
-        previous: prev,
-        current: curr,
-      })),
+      map(([previous, current]) => ({ previous, current })),
       startWith<MousePositionData>({
-        previous: {
-          x: 0,
-          y: 0,
-        },
-        current: {
-          x: 0,
-          y: 0,
-        },
+        previous: { x: 0, y: 0 },
+        current: { x: 0, y: 0 },
       })
     );
 
