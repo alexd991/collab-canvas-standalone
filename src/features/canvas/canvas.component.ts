@@ -1,6 +1,6 @@
 import { DOCUMENT } from '@angular/common';
-import { ChangeDetectionStrategy, Component, ElementRef, HostListener, Inject, viewChild } from '@angular/core';
-import { Observable, Subscription, debounceTime, fromEvent, map, pairwise, reduce, startWith, switchMap, takeUntil, tap } from 'rxjs';
+import { ChangeDetectionStrategy, Component, ElementRef, Inject, viewChild } from '@angular/core';
+import { Observable, Subscription, debounceTime, fromEvent, map, pairwise, startWith, switchMap, takeUntil, tap } from 'rxjs';
 import { CanvasControlService, CanvasHistoryService } from './services';
 import { CursorMode, MousePositionData } from './canvas.models';
 import { WINDOW } from '../../tokens/window.token';
@@ -31,14 +31,14 @@ export class CanvasComponent {
     this._canvas.height = Math.floor(this._elRef.nativeElement.clientHeight);
     this._canvas.width = Math.floor(this._elRef.nativeElement.clientWidth);
 
-    this.initialiseDrawEvents();
+    this.initialiseCanvas();
   }
 
   public ngOnDestroy() {
     this._subscriptions.unsubscribe();
   }
 
-  private initialiseDrawEvents(): void {
+  private initialiseCanvas(): void {
     const canvasContext = this._canvas.getContext('2d', { alpha: false, willReadFrequently: true })!;
     this.initialiseCanvasContext(canvasContext);
 
@@ -69,6 +69,14 @@ export class CanvasComponent {
     this.createSubscriptions(mouseDown$, mousePositionData$, mouseUp$, canvasContext);
   }
 
+  private initialiseCanvasContext(canvasContext: CanvasRenderingContext2D): void {
+    canvasContext.lineCap = 'round';
+    canvasContext.lineJoin = 'round';
+    canvasContext.lineWidth = this._canvasControl.strokeWidth();
+    canvasContext.strokeStyle = this._canvasControl.colour();
+    this.clearCanvas(canvasContext);
+  }
+
   private createSubscriptions(
     mouseDown$: Observable<MouseEvent>,
     mousePositionData$: Observable<MousePositionData>,
@@ -78,8 +86,8 @@ export class CanvasComponent {
     this._subscriptions.add(
       mouseDown$
         .pipe(
-          tap(() => this.storeSnapshot(canvasContext)),
-          switchMap(() => mousePositionData$.pipe(takeUntil(mouseUp$), debounceTime(2)))
+          tap(() => this.storeCanvasSnapshot(canvasContext)),
+          switchMap(() => mousePositionData$.pipe(takeUntil(mouseUp$)))
         )
         .subscribe((mousePosData) => {
           canvasContext.lineWidth = this._canvasControl.strokeWidth();
@@ -93,9 +101,7 @@ export class CanvasComponent {
 
     this._subscriptions.add(
       fromEvent(this._window, 'resize')
-        .pipe(
-          debounceTime(100)
-        )
+        .pipe(debounceTime(100))
         .subscribe(() => {
           const imageData = canvasContext.getImageData(0, 0, this._canvas.width, this._canvas.height);
 
@@ -112,10 +118,9 @@ export class CanvasComponent {
 
     this._subscriptions.add(
       this._canvasControl.canvasUndo$.subscribe(() => {
-        const lastSnapshot = this._canvasHistory.getLastSnapshot();
-        if (lastSnapshot) {
-          this.clearCanvas(canvasContext);
-          canvasContext.putImageData(lastSnapshot, 0, 0);
+        const latestSnapshot = this._canvasHistory.getLatestSnapshot();
+        if (latestSnapshot) {
+          canvasContext.putImageData(latestSnapshot, 0, 0);
         }
       })
     );
@@ -123,14 +128,6 @@ export class CanvasComponent {
     this._subscriptions.add(
       this._canvasControl.clearCanvas$.subscribe(() => this.clearCanvas(canvasContext))
     );
-  }
-
-  private initialiseCanvasContext(canvasContext: CanvasRenderingContext2D): void {
-    canvasContext.lineCap = 'round';
-    canvasContext.lineJoin = 'round';
-    canvasContext.lineWidth = this._canvasControl.strokeWidth();
-    canvasContext.strokeStyle = this._canvasControl.colour();
-    this.clearCanvas(canvasContext);
   }
 
   private drawBrushStroke(
@@ -150,12 +147,12 @@ export class CanvasComponent {
     canvasContext.stroke();
   }
 
-  private storeSnapshot(canvasContext: CanvasRenderingContext2D): void {
+  private storeCanvasSnapshot(canvasContext: CanvasRenderingContext2D): void {
     this._canvasHistory.addSnapshot(canvasContext.getImageData(0, 0, this._canvas.width, this._canvas.height));
   }
 
   private clearCanvas(canvasContext: CanvasRenderingContext2D): void {
-    this.storeSnapshot(canvasContext);
+    this.storeCanvasSnapshot(canvasContext);
     canvasContext.fillStyle = 'white';
     canvasContext.fillRect(0, 0, this._canvas.width, this._canvas.height);
   }

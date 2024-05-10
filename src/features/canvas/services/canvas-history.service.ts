@@ -1,14 +1,15 @@
-import { Injectable, signal } from "@angular/core";
+import { Injectable } from "@angular/core";
+import { CanvasUndoBuffer } from "../../../utils";
 
 @Injectable({ providedIn: 'root' })
 export class CanvasHistoryService {
-  private readonly _canvasSnapshotHistory: Array<ImageData> = [];
+  private _canvasSnapshotHistory: Array<ImageData> = [];
 
   public addSnapshot(snapshot: ImageData): void {
-    this._canvasSnapshotHistory.push(snapshot);
+    this._canvasSnapshotHistory = [...this._canvasSnapshotHistory, snapshot].slice(-CanvasUndoBuffer);
   }
 
-  public getLastSnapshot(): ImageData | undefined {
+  public getLatestSnapshot(): ImageData | undefined {
     return this._canvasSnapshotHistory.pop();
   }
 }
