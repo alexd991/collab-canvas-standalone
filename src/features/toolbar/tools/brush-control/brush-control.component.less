@@ -1,19 +1,5 @@
 @import "../../../../styles/mixins.less";
 
-.icon {
-  display: block;
-  height: 30px;
-
-  &.brush:hover {
-    cursor: pointer;
-  }
-
-  img {
-    height: 30px;
-    width: 30px;
-  }
-}
-
 .brush-control-modal {
   display: grid;
   grid-template-rows: 1.5fr 1fr;
@@ -74,7 +60,7 @@
         border-bottom-right-radius: 5px;
       }
 
-      &:hover {
+      &:hover:not(.selected) {
         background-color: @blue-button-hover;
       }
 

@@ -1,45 +1,46 @@
-<a class="icon brush" (click)="onClickOnIcon()" title="Brush Control">
-  <img [src]="iconUrl()" alt="paintbrush" />
-</a>
-@if (showModal()) {
-<div class="brush-control-modal">
-  <div class="stroke-width">
-    <div class="title">
-      {{ cursorMode() }} Width
-      <span class="value"
-        ><strong>{{ strokeWidth() }}</strong></span
-      >
+<app-icon-modal
+  [iconUrl]="iconUrl()"
+  iconClass="brush"
+  iconAlt="paintbrush"
+  iconTitle="Brush Control">
+  <div class="brush-control-modal">
+    <div class="stroke-width">
+      <div class="title">
+        {{ cursorMode() }} Width
+        <span class="value">
+          <strong>{{ strokeWidth() }}</strong>
+        </span>
+      </div>
+      <div class="control">
+        <mat-slider min="1" max="30" step="1">
+          <input
+            matSliderThumb
+            [value]="strokeWidth()"
+            (input)="setNewStrokeWidth($event)"
+            title="Brush Width"
+          />
+        </mat-slider>
+        <svg viewBox="0 0 30 10" xmlns="http://www.w3.org/2000/svg">
+          <circle
+            cx="50%"
+            cy="50%"
+            [attr.r]="halfStrokeRadius()"
+            [attr.fill]="colour()"
+            stroke="white"
+            stroke-width="0.75"
+          />
+        </svg>
+      </div>
     </div>
-    <div class="control">
-      <mat-slider min="1" max="30" step="1">
-        <input
-          matSliderThumb
-          [value]="strokeWidth()"
-          (input)="setNewStrokeWidth($event)"
-          title="Brush Width"
-        />
-      </mat-slider>
-      <svg viewBox="0 0 30 10" xmlns="http://www.w3.org/2000/svg">
-        <circle
-          cx="50%"
-          cy="50%"
-          [attr.r]="halfStrokeRadius()"
-          [attr.fill]="colour()"
-          stroke="white"
-          stroke-width="0.75"
-        />
-      </svg>
+    <div class="mode-selector">
+      <div class="control">
+        <button type="button" class="icon brush" [ngClass]="{'selected': brushMode()}" (click)="setNewCursorMode(CursorMode.Brush)">
+          <img [src]="CursorModeUrl.Brush" alt="Brush" class="brush" />
+        </button>
+        <button type="button" class="icon rubber" [ngClass]="{'selected': rubberMode()}" (click)="setNewCursorMode(CursorMode.Rubber)">
+          <img [src]="CursorModeUrl.Rubber" alt="Rubber" class="rubber" />
+        </button>
+      </div>
     </div>
   </div>
-  <div class="mode-selector">
-    <div class="control">
-      <button type="button" class="icon brush" [ngClass]="{'selected': brushMode()}" (click)="setNewCursorMode(CursorMode.Brush)">
-        <img [src]="CursorModeUrl.Brush" alt="Brush" class="brush" />
-      </button>
-      <button type="button" class="icon rubber" [ngClass]="{'selected': rubberMode()}" (click)="setNewCursorMode(CursorMode.Rubber)">
-        <img [src]="CursorModeUrl.Rubber" alt="Rubber" class="rubber" />
-      </button>
-    </div>
-  </div>
-</div>
-}
+</app-icon-modal>

@@ -1,0 +1,6 @@
+<a class="icon" [ngClass]="iconClass" (click)="onClickOnIcon()" [title]="iconTitle">
+  <img [src]="iconUrl()" [alt]="iconAlt" title="icon" />
+</a>
+@if (showModal()) {
+  <ng-content/>
+}

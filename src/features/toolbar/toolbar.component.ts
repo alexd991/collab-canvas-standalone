@@ -16,7 +16,7 @@ import { BrushControlComponent, ColourSelectorComponent } from './tools';
 export class ToolbarComponent {
   private readonly _canvasControl = inject(CanvasControlService);
 
-  protected colour = this._canvasControl.colour;
-  protected strokeWidth = this._canvasControl.strokeWidth;
-  protected cursorMode = this._canvasControl.cursorMode;
+  protected readonly colour = this._canvasControl.colour;
+  protected readonly strokeWidth = this._canvasControl.strokeWidth;
+  protected readonly cursorMode = this._canvasControl.cursorMode;
 }

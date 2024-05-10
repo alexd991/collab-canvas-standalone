@@ -1,7 +1,8 @@
-import { Component, ElementRef, HostListener, ViewEncapsulation, computed, inject, input, model, signal } from '@angular/core';
+import { Component, ViewEncapsulation, computed, input, model } from '@angular/core';
 import { MatSliderModule } from '@angular/material/slider';
 import { CommonModule } from '@angular/common';
 import { CursorMode, CursorModeUrl } from '../../../canvas';
+import { IconModalComponent } from '../../../../utils';
 
 @Component({
   selector: 'app-brush-control',
@@ -12,6 +13,7 @@ import { CursorMode, CursorModeUrl } from '../../../canvas';
   imports: [
     CommonModule,
     MatSliderModule,
+    IconModalComponent,
   ],
 })
 export class BrushControlComponent {
@@ -26,21 +28,6 @@ export class BrushControlComponent {
   public readonly brushMode = computed(() => this.cursorMode() === CursorMode.Brush);
   public readonly rubberMode = computed(() => this.cursorMode() === CursorMode.Rubber);
   public readonly iconUrl = computed(() => this.brushMode() ? CursorModeUrl.Brush : CursorModeUrl.Rubber);
-
-  public readonly showModal = signal(false);
-
-  private readonly _elRef = inject(ElementRef);
-
-  @HostListener('document:mousedown', ['$event'])
-  public onClickOutsideModal(event: Event): void {
-    if (this.showModal() && !this._elRef.nativeElement.contains(event.target)) {
-      this.showModal.set(false);
-    }
-  }
-
-  protected onClickOnIcon(): void {
-    this.showModal.update((cond) => !cond);
-  }
 
   protected setNewStrokeWidth(inputEvent: Event): void {
     this.strokeWidth.set(Number((inputEvent.target as HTMLInputElement).value));
