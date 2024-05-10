@@ -19,7 +19,6 @@ export class CanvasComponent {
   private readonly _subscriptions = new Subscription();
 
   public constructor(
-    private readonly _elRef: ElementRef,
     private readonly _canvasControl: CanvasControlService,
     private readonly _canvasHistory: CanvasHistoryService,
     @Inject(DOCUMENT) private readonly _document: Document,
@@ -28,9 +27,6 @@ export class CanvasComponent {
 
   public ngAfterViewInit() {
     this._canvas = this._canvasElRef().nativeElement;
-    this._canvas.height = Math.floor(this._elRef.nativeElement.clientHeight);
-    this._canvas.width = Math.floor(this._elRef.nativeElement.clientWidth);
-
     this.initialiseCanvas();
   }
 
@@ -40,6 +36,7 @@ export class CanvasComponent {
 
   private initialiseCanvas(): void {
     const canvasContext = this._canvas.getContext('2d', { alpha: false, willReadFrequently: true })!;
+    this.setCanvasDimensions();
     this.initialiseCanvasContext(canvasContext);
 
     const mouseDown$ = fromEvent<MouseEvent>(this._canvas, 'pointerdown');
@@ -105,8 +102,7 @@ export class CanvasComponent {
         .subscribe(() => {
           const imageData = canvasContext.getImageData(0, 0, this._canvas.width, this._canvas.height);
 
-          this._canvas.height = Math.floor((this._document.activeElement!.clientHeight - (NavbarHeight + FooterHeight)) * IdealCanvasDimensionPercentage);
-          this._canvas.width = Math.floor(this._document.activeElement!.clientWidth * IdealCanvasDimensionPercentage);
+          this.setCanvasDimensions();
 
           this.clearCanvas(canvasContext);
           canvasContext.lineCap = 'round';
@@ -145,6 +141,11 @@ export class CanvasComponent {
     canvasContext.lineTo(current.x, current.y);
     canvasContext.closePath();
     canvasContext.stroke();
+  }
+
+  private setCanvasDimensions(): void {
+    this._canvas.height = Math.floor((this._document.activeElement!.clientHeight - (NavbarHeight + FooterHeight)) * IdealCanvasDimensionPercentage);
+    this._canvas.width = Math.floor(this._document.activeElement!.clientWidth * IdealCanvasDimensionPercentage);
   }
 
   private storeCanvasSnapshot(canvasContext: CanvasRenderingContext2D): void {
