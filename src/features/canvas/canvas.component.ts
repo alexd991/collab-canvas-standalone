@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, Component, ElementRef, Inject, viewChild } from '@angular/core';
-import { Subscription, debounceTime, filter, fromEvent, map, pairwise, startWith, switchMap, takeUntil, tap } from 'rxjs';
+import { Observable, Subscription, debounceTime, filter, fromEvent, map, pairwise, startWith, switchMap, takeUntil, tap } from 'rxjs';
 import { CanvasControlService, CanvasHistoryService } from './services';
 import { CanvasEventStreams, CursorMode, CanvasPosition, LineData } from './canvas.models';
 import { DOCUMENT, WINDOW } from '../../tokens';
 import { FOOTER_HEIGHT, IDEAL_CANVAS_DIMENSION_PCT, LINE_STYLE, NAVBAR_HEIGHT, WHITE, lineHasNoLength } from '../../utils';
-import { FillData, colourMatch, hexToRGBA, getOldColour, replacePixel } from '../toolbar/tools/flood-fill';
+import { FillData, colourMatch, hexToRGBA, getOldColour, replacePixel, floodFillImageData } from '../toolbar/tools/flood-fill';
 
 @Component({
   selector: 'app-canvas',
@@ -45,21 +45,19 @@ export class CanvasComponent {
   }
 
   private createCanvasEventStreams(canvasContext: CanvasRenderingContext2D): CanvasEventStreams {
-    const mouseDownFreeDraw$ = fromEvent<MouseEvent>(this._canvas, 'pointerdown').pipe(
-      filter(
-        () => this._canvasControl.cursorMode() === CursorMode.Brush || this._canvasControl.cursorMode() === CursorMode.Rubber
-      ),
-      tap(() => this.storeCanvasSnapshot(canvasContext)),
+    const mouseDownFreeDraw$ = this.createPointerDownEvent(
+      () => this._canvasControl.cursorMode() === CursorMode.Brush || this._canvasControl.cursorMode() === CursorMode.Rubber,
+      canvasContext
     );
 
-    const mouseDownLine$ = fromEvent<MouseEvent>(this._canvas, 'pointerdown').pipe(
-      filter(() => this._canvasControl.cursorMode() === CursorMode.Line),
-      tap(() => this.storeCanvasSnapshot(canvasContext)),
+    const mouseDownLine$ = this.createPointerDownEvent(
+      () => this._canvasControl.cursorMode() === CursorMode.Line,
+      canvasContext
     );
 
-    const mouseDownFill$ = fromEvent<MouseEvent>(this._canvas, 'pointerdown').pipe(
-      filter(() => this._canvasControl.cursorMode() === CursorMode.Fill),
-      tap(() => this.storeCanvasSnapshot(canvasContext)),
+    const mouseDownFill$ = this.createPointerDownEvent(
+      () => this._canvasControl.cursorMode() === CursorMode.Fill,
+      canvasContext
     );
 
     const mouseUp$ = fromEvent<MouseEvent>(this._document, 'pointerup');
@@ -198,31 +196,7 @@ export class CanvasComponent {
     fillData: FillData,
     canvasContext: CanvasRenderingContext2D,
   ): void {
-    const { startPosition, imageData, oldColour, newColour } = fillData;
-
-    const data = imageData.data;
-    const xLength = imageData.width;
-    const yLength = imageData.height;
-    const startIdx = [startPosition.x, startPosition.y] as const;
-
-    const queue = [startIdx];
-
-    while(queue.length) {
-      const [x, y] = queue.pop()!;
-
-      if (x < 0 || x >= xLength || y < 0 || y >= yLength) {
-        continue;
-      }
-
-      const index = (y * xLength + x) * 4;
-      const currentPixel = data.slice(index, index + 4);
-
-      if (colourMatch(currentPixel, oldColour)) {
-        replacePixel(data, index, newColour);
-        queue.push([x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]);
-      }
-    }
-
+    const imageData = floodFillImageData(fillData);
     canvasContext.putImageData(imageData, 0, 0);
   }
 
@@ -252,5 +226,15 @@ export class CanvasComponent {
       x: Math.floor(event.clientX - this._canvas.getBoundingClientRect().left),
       y: Math.floor(event.clientY - this._canvas.getBoundingClientRect().top),
     };
+  }
+
+  private createPointerDownEvent(
+    filterCond: () => boolean,
+    canvasContext: CanvasRenderingContext2D
+  ): Observable<MouseEvent> {
+    return fromEvent<MouseEvent>(this._canvas, 'pointerdown').pipe(
+      filter(filterCond),
+      tap(() => this.storeCanvasSnapshot(canvasContext)),
+    );
   }
 }
