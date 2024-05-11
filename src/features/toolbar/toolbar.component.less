@@ -4,8 +4,23 @@
 
 .toolbar-container {
   .bar-sizing();
-}
 
-.toolbar-container > div {
-  padding-right: 3vw;
+  &>div {
+    margin-right: 3vw;
+    height: 40px;
+    width: 4vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: content-box;
+  }
+
+  .brush-control,
+  .flood-fill {
+    border: 3px solid transparent;
+    &.selected {
+      border-bottom: 3px ridge @text-bright;
+      border-radius: 1px;
+    }
+  }
 }

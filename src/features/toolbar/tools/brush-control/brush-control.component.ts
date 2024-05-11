@@ -1,9 +1,10 @@
-import { Component, ViewEncapsulation, computed, input, model, signal } from '@angular/core';
+import { Component, ViewEncapsulation, computed, input, model, output, signal } from '@angular/core';
 import { MatSliderModule } from '@angular/material/slider';
 import { CommonModule } from '@angular/common';
 import { CursorMode, CursorModeUrl } from '../../../canvas';
 import { IconModalComponent } from '../../../../utils';
 import { BrushControlButton } from './brush-control.models';
+import { ISelectableToolbarItem, SelectableToolbarItem } from '../../toolbar.models';
 
 @Component({
   selector: 'app-brush-control',
@@ -17,7 +18,7 @@ import { BrushControlButton } from './brush-control.models';
     IconModalComponent,
   ],
 })
-export class BrushControlComponent {
+export class BrushControlComponent implements ISelectableToolbarItem {
   public readonly CursorMode = CursorMode;
   public readonly CursorModeUrl = CursorModeUrl;
 
@@ -69,6 +70,12 @@ export class BrushControlComponent {
 
     return true;
   };
+
+  public readonly clickEmitter = output<SelectableToolbarItem>();
+
+  public onClick(): void {
+    this.clickEmitter.emit(SelectableToolbarItem.BrushControl);
+  }
 
   protected setNewStrokeDiameter(inputEvent: Event): void {
     this.strokeDiameter.set(Number((inputEvent.target as HTMLInputElement).value));

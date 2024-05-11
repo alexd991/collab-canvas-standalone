@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, ElementRef, HostListener, ViewEncapsulation, input, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { hostAttribute } from '../host-attribute';
 
 @Component({
   selector: 'app-icon-modal',
@@ -16,7 +17,7 @@ export class IconModalComponent {
 
   public readonly shouldToggleFn = input<() => boolean>();
   public readonly iconUrl = input.required<string>();
-  public readonly iconTitle = input.required<string>();
+  public readonly iconTitle = hostAttribute.required<string>('iconTitle');
   public readonly iconClass = input<string>();
 
   public onIconClick(): void {

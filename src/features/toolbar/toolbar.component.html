@@ -4,14 +4,15 @@
       [(colour)]="colour"
     />
   </div>
-  <div class="brush-control">
+  <div class="brush-control" [ngClass]="{'selected': selectedToolbarItem() === SelectableToolbarItem.BrushControl}">
     <app-brush-control
       [colour]="colour()"
       [(strokeDiameter)]="strokeDiameter"
       [(cursorMode)]="cursorMode"
+      (clickEmitter)="setToolbarItem(SelectableToolbarItem.BrushControl)"
     />
   </div>
-  <div class="flood-fill">
-    <app-flood-fill/>
+  <div class="flood-fill" [ngClass]="{'selected': selectedToolbarItem() === SelectableToolbarItem.FloodFill}">
+    <app-flood-fill (clickEmitter)="setToolbarItem(SelectableToolbarItem.FloodFill)"/>
   </div>
 </div>
