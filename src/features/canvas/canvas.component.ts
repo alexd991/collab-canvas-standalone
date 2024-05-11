@@ -66,11 +66,11 @@ export class CanvasComponent {
     const lineData$ = canvasPosition$
       .pipe(
         pairwise(),
-        map(([start, end]) => ({ start, end })),
+        map(([start, end]): LineData => ({ start, end })),
         startWith<LineData>({
           start: { x: 0, y: 0 },
           end: { x: 0, y: 0 },
-        })
+        }),
       );
 
     return {
@@ -125,7 +125,7 @@ export class CanvasComponent {
 
     this._subscriptions.add(
       fromEvent(this._window, 'resize')
-        .pipe(debounceTime(100))
+        .pipe(debounceTime(10))
         .subscribe(() => {
           const imageData = canvasContext.getImageData(0, 0, this._canvas.width, this._canvas.height);
 
@@ -164,7 +164,7 @@ export class CanvasComponent {
       return;
     }
 
-    canvasContext.lineWidth = this._canvasControl.strokeWidth();
+    canvasContext.lineWidth = this._canvasControl.strokeDiameter();
     canvasContext.strokeStyle = this._canvasControl.cursorMode() === CursorMode.Rubber
       ? RUBBER_COLOUR
       : this._canvasControl.colour();
@@ -184,7 +184,7 @@ export class CanvasComponent {
   private initialiseCanvasContext(canvasContext: CanvasRenderingContext2D): void {
     canvasContext.lineCap = LINE_STYLE;
     canvasContext.lineJoin = LINE_STYLE;
-    canvasContext.lineWidth = this._canvasControl.strokeWidth();
+    canvasContext.lineWidth = this._canvasControl.strokeDiameter();
     canvasContext.strokeStyle = this._canvasControl.colour();
   }
 

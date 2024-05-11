@@ -3,6 +3,7 @@ import { MatSliderModule } from '@angular/material/slider';
 import { CommonModule } from '@angular/common';
 import { CursorMode, CursorModeUrl } from '../../../canvas';
 import { IconModalComponent } from '../../../../utils';
+import { BrushControlButton } from './brush-control.models';
 
 @Component({
   selector: 'app-brush-control',
@@ -21,10 +22,10 @@ export class BrushControlComponent {
   public readonly CursorModeUrl = CursorModeUrl;
 
   public readonly colour = input.required<string>();
-  public readonly strokeWidth = model.required<number>();
+  public readonly strokeDiameter = model.required<number>();
   public readonly cursorMode = model.required<CursorMode>();
 
-  public readonly halfStrokeRadius = computed(() => this.strokeWidth() / 4);
+  public readonly halfStrokeRadius = computed(() => this.strokeDiameter() / 4);
   public readonly iconUrl = computed(() => {
     switch (this.cursorMode()) {
       case CursorMode.Brush:
@@ -38,12 +39,29 @@ export class BrushControlComponent {
     }
   });
 
-  public readonly brushMode = computed(() => this.cursorMode() === CursorMode.Brush);
-  public readonly rubberMode = computed(() => this.cursorMode() === CursorMode.Rubber);
-  public readonly lineMode = computed(() => this.cursorMode() === CursorMode.Line);
+  public readonly brushControlButtons: BrushControlButton[] = [
+    {
+      cursorMode: CursorMode.Brush,
+      cursorModeUrl: CursorModeUrl.Brush,
+      class: "brush",
+      selected: computed(() => this.cursorMode() === CursorMode.Brush),
+    },
+    {
+      cursorMode: CursorMode.Rubber,
+      cursorModeUrl: CursorModeUrl.Rubber,
+      class: "rubber",
+      selected: computed(() => this.cursorMode() === CursorMode.Rubber),
+    },
+    {
+      cursorMode: CursorMode.Line,
+      cursorModeUrl: CursorModeUrl.Line,
+      class: "line",
+      selected: computed(() => this.cursorMode() === CursorMode.Line),
+    },
+  ];
 
-  protected setNewStrokeWidth(inputEvent: Event): void {
-    this.strokeWidth.set(Number((inputEvent.target as HTMLInputElement).value));
+  protected setNewStrokeDiameter(inputEvent: Event): void {
+    this.strokeDiameter.set(Number((inputEvent.target as HTMLInputElement).value));
   }
 
   protected setNewCursorMode(newMode: CursorMode): void {

@@ -11,7 +11,7 @@ export class CanvasControlService {
   public readonly canvasUndo$ = this._canvasUndoSubject.asObservable();
 
   public readonly colour = signal('#000000');
-  public readonly strokeWidth = signal(15);
+  public readonly strokeDiameter = signal(15);
   public readonly cursorMode = signal(CursorMode.Brush);
 
   public clearCanvas(): void {

@@ -17,6 +17,6 @@ export class ToolbarComponent {
   private readonly _canvasControl = inject(CanvasControlService);
 
   protected readonly colour = this._canvasControl.colour;
-  protected readonly strokeWidth = this._canvasControl.strokeWidth;
+  protected readonly strokeDiameter = this._canvasControl.strokeDiameter;
   protected readonly cursorMode = this._canvasControl.cursorMode;
 }
