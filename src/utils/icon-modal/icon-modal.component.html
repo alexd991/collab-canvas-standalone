@@ -1,5 +1,5 @@
-<a class="icon" [ngClass]="iconClass" (click)="toggleModal()" [title]="iconTitle">
-  <img [src]="iconUrl()" [alt]="iconAlt" title="icon" />
+<a class="icon" (click)="toggleModal()">
+  <img [src]="iconUrl()" alt="icon" [title]="iconTitle()"/>
 </a>
 @if (showModal()) {
   <ng-content/>

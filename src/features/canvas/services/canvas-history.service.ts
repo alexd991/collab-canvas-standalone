@@ -11,11 +11,15 @@ export class CanvasHistoryService {
     this._canvasSnapshotHistory.update(history => [...history, snapshot].slice(-UNDO_BUFFER));
   }
 
-  public getLatestSnapshot(): ImageData | undefined {
+  public latestSnapshot(): ImageData | undefined {
     const latestSnapshot = this._canvasSnapshotHistory().slice(-1)[0];
 
     this._canvasSnapshotHistory.update(history => history.slice(0, -1));
 
     return latestSnapshot;
+  }
+
+  public latestSnapshotCopy(): ImageData | undefined {
+    return this._canvasSnapshotHistory().slice(-1)[0];
   }
 }

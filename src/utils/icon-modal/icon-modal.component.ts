@@ -1,6 +1,5 @@
-import { ChangeDetectionStrategy, Component, ElementRef, HostListener, Renderer2, ViewEncapsulation, inject, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, HostListener, ViewEncapsulation, input, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { hostAttribute } from '../host-attribute';
 
 @Component({
   selector: 'app-icon-modal',
@@ -8,23 +7,16 @@ import { hostAttribute } from '../host-attribute';
   templateUrl: './icon-modal.component.html',
   styleUrl: './icon-modal.component.less',
   imports: [CommonModule],
-  encapsulation: ViewEncapsulation.ShadowDom,
+  encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IconModalComponent {
   private readonly _elRef = inject(ElementRef);
-  private readonly _renderer = inject(Renderer2);
-
-  protected readonly iconAlt = hostAttribute.required('iconAlt');
-  protected readonly iconTitle = hostAttribute.required('iconTitle');
-  protected readonly iconClass = hostAttribute.required('iconClass');
   protected readonly showModal = signal<boolean>(false);
 
   public readonly iconUrl = input.required<string>();
-
-  public ngAfterViewInit(): void {
-    this._renderer.addClass(this._elRef.nativeElement, this.iconClass);
-  }
+  public readonly iconTitle = input.required<string>();
+  public readonly iconClass = input<string>();
 
   public toggleModal(): void {
     this.showModal.update((value) => !value);

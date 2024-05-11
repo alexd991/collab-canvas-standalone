@@ -1,8 +1,7 @@
 <app-icon-modal
   [iconUrl]="iconUrl()"
-  iconClass="brush"
-  iconAlt="paintbrush"
-  iconTitle="Brush Control">
+  [iconTitle]="cursorMode()"
+  iconAlt="paintbrush">
   <div class="brush-control-modal">
     <div class="stroke-width">
       <div class="title">
@@ -35,10 +34,13 @@
     <div class="mode-selector">
       <div class="control">
         <button type="button" class="icon brush" [ngClass]="{'selected': brushMode()}" (click)="setNewCursorMode(CursorMode.Brush)">
-          <img [src]="CursorModeUrl.Brush" alt="Brush" class="brush" />
+          <img [src]="CursorModeUrl.Brush" alt="Brush" class="brush" title="Brush" />
         </button>
         <button type="button" class="icon rubber" [ngClass]="{'selected': rubberMode()}" (click)="setNewCursorMode(CursorMode.Rubber)">
-          <img [src]="CursorModeUrl.Rubber" alt="Rubber" class="rubber" />
+          <img [src]="CursorModeUrl.Rubber" alt="Rubber" class="rubber" title="Rubber" />
+        </button>
+        <button type="button" class="icon line" [ngClass]="{'selected': lineMode()}" (click)="setNewCursorMode(CursorMode.Line)">
+          <img [src]="CursorModeUrl.Line" alt="Straight line" class="line" title="Line" />
         </button>
       </div>
     </div>

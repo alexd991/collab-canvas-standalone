@@ -25,9 +25,22 @@ export class BrushControlComponent {
   public readonly cursorMode = model.required<CursorMode>();
 
   public readonly halfStrokeRadius = computed(() => this.strokeWidth() / 4);
+  public readonly iconUrl = computed(() => {
+    switch (this.cursorMode()) {
+      case CursorMode.Brush:
+        return CursorModeUrl.Brush;
+      case CursorMode.Rubber:
+        return CursorModeUrl.Rubber;
+      case CursorMode.Line:
+        return CursorModeUrl.Line;
+      default:
+        return '';
+    }
+  });
+
   public readonly brushMode = computed(() => this.cursorMode() === CursorMode.Brush);
   public readonly rubberMode = computed(() => this.cursorMode() === CursorMode.Rubber);
-  public readonly iconUrl = computed(() => this.brushMode() ? CursorModeUrl.Brush : CursorModeUrl.Rubber);
+  public readonly lineMode = computed(() => this.cursorMode() === CursorMode.Line);
 
   protected setNewStrokeWidth(inputEvent: Event): void {
     this.strokeWidth.set(Number((inputEvent.target as HTMLInputElement).value));

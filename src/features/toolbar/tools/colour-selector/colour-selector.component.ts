@@ -24,7 +24,7 @@ import { NgxColorsModule } from 'ngx-colors';
   ],
 })
 export class ColourSelectorComponent {
-  public colour = model.required<string>();
+  public readonly colour = model.required<string>();
 
   protected setNewColour(hexCode: string): void {
     if(!hexCode)

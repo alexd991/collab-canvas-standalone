@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, Component, ElementRef, Inject, effect, viewChild } from '@angular/core';
-import { Observable, Subscription, debounceTime, fromEvent, map, pairwise, startWith, switchMap, takeUntil, tap } from 'rxjs';
+import { ChangeDetectionStrategy, Component, ElementRef, Inject, viewChild } from '@angular/core';
+import { Subscription, debounceTime, filter, fromEvent, map, pairwise, startWith, switchMap, takeUntil, tap } from 'rxjs';
 import { CanvasControlService, CanvasHistoryService } from './services';
-import { CursorMode, MousePositionData } from './canvas.models';
+import { CanvasEventData, CursorMode, CanvasPosition, LineData } from './canvas.models';
 import { DOCUMENT, WINDOW } from '../../tokens';
 import { FOOTER_HEIGHT, IDEAL_CANVAS_DIMENSION_PCT, LINE_STYLE, NAVBAR_HEIGHT, RUBBER_COLOUR } from '../../utils';
 
@@ -40,43 +40,86 @@ export class CanvasComponent {
     this.initialiseCanvasContext(canvasContext);
     this.fillCanvasWhite(canvasContext);
 
-    const mouseDown$ = fromEvent<MouseEvent>(this._canvas, 'pointerdown');
-    const mouseUp$ = fromEvent<MouseEvent>(this._document, 'pointerup');
-    const mousePositionData$ = fromEvent<MouseEvent>(this._canvas, 'pointermove').pipe(
-      map((event: MouseEvent) => ({
-        x: Math.floor(event.clientX - this._canvas.getBoundingClientRect().left),
-        y: Math.floor(event.clientY - this._canvas.getBoundingClientRect().top),
-      })),
-      pairwise(),
-      map(([previous, current]) => ({ previous, current })),
-      startWith<MousePositionData>({
-        previous: { x: 0, y: 0 },
-        current: { x: 0, y: 0 },
-      })
-    );
-
-    this.createSubscriptions(mouseDown$, mousePositionData$, mouseUp$, canvasContext);
+    this.createSubscriptions(this.createCanvasEventData(canvasContext));
   }
 
-  private createSubscriptions(
-    mouseDown$: Observable<MouseEvent>,
-    mousePositionData$: Observable<MousePositionData>,
-    mouseUp$: Observable<MouseEvent>,
-    canvasContext: CanvasRenderingContext2D
-  ): void {
-    this._subscriptions.add(
-      mouseDown$
-        .pipe(
-          tap(() => this.storeCanvasSnapshot(canvasContext)),
-          switchMap(() => mousePositionData$.pipe(takeUntil(mouseUp$)))
-        )
-        .subscribe((mousePosData) => {
-          canvasContext.lineWidth = this._canvasControl.strokeWidth();
-          canvasContext.strokeStyle = this._canvasControl.cursorMode() === CursorMode.Brush
-            ? this._canvasControl.colour()
-            : RUBBER_COLOUR;
+  private createCanvasEventData(canvasContext: CanvasRenderingContext2D): CanvasEventData {
+    const mouseDownFreeDraw$ = fromEvent<MouseEvent>(this._canvas, 'pointerdown')
+      .pipe(
+        filter(() => this._canvasControl.cursorMode() !== CursorMode.Line),
+        tap(() => this.storeCanvasSnapshot(canvasContext)),
+      );
 
-          this.drawBrushStroke(canvasContext, mousePosData);
+    const mouseDownLine$ = fromEvent<MouseEvent>(this._canvas, 'pointerdown')
+      .pipe(
+        filter(() => this._canvasControl.cursorMode() === CursorMode.Line),
+        tap(() => this.storeCanvasSnapshot(canvasContext)),
+      );
+
+    const mouseUp$ = fromEvent<MouseEvent>(this._document, 'pointerup');
+
+    const canvasPosition$ = fromEvent<MouseEvent>(this._canvas, 'pointermove')
+      .pipe(
+        map((event: MouseEvent) => this.toCanvasPosition(event)),
+      );
+
+    const lineData$ = canvasPosition$
+      .pipe(
+        pairwise(),
+        map(([start, end]) => ({ start, end })),
+        startWith<LineData>({
+          start: { x: 0, y: 0 },
+          end: { x: 0, y: 0 },
+        })
+      );
+
+    return {
+      mouseDownFreeDraw$,
+      mouseDownLine$,
+      canvasPosition$,
+      lineData$,
+      mouseUp$,
+      canvasContext,
+    }
+  }
+
+  private createSubscriptions(canvasEventData: CanvasEventData): void {
+    const {
+      mouseDownFreeDraw$,
+      mouseDownLine$,
+      canvasPosition$,
+      lineData$,
+      mouseUp$,
+      canvasContext,
+    } = canvasEventData;
+
+    this._subscriptions.add(
+      mouseDownFreeDraw$
+        .pipe(
+          switchMap(() => lineData$.pipe(takeUntil(mouseUp$)))
+        )
+        .subscribe((lineData) => {
+          this.drawBrushStroke(canvasContext, lineData);
+        })
+    );
+
+    this._subscriptions.add(
+      mouseDownLine$
+        .pipe(
+          map((event: MouseEvent) => [ this.toCanvasPosition(event), this._canvasHistory.latestSnapshotCopy() ] as const),
+          switchMap(([start, snapshot]) => canvasPosition$
+            .pipe(
+              map((end) => ([ { start, end } as LineData, snapshot ] as const)),
+              takeUntil(mouseUp$)
+            ),
+          ),
+        ).subscribe(([lineData, snapshot]) => {
+          // remove temporary line by restoring the previous snapshot
+          if(snapshot){
+            canvasContext.putImageData(snapshot, 0, 0);
+          }
+
+          this.drawBrushStroke(canvasContext, lineData);
         })
     );
 
@@ -96,7 +139,7 @@ export class CanvasComponent {
 
     this._subscriptions.add(
       this._canvasControl.canvasUndo$.subscribe(() => {
-        const latestSnapshot = this._canvasHistory.getLatestSnapshot();
+        const latestSnapshot = this._canvasHistory.latestSnapshot();
         if (latestSnapshot) {
           canvasContext.putImageData(latestSnapshot, 0, 0);
         }
@@ -113,17 +156,22 @@ export class CanvasComponent {
 
   private drawBrushStroke(
     canvasContext: CanvasRenderingContext2D,
-    mousePosData: MousePositionData
+    lineData: LineData
   ): void {
-    const { previous, current } = mousePosData;
+    const { start, end } = lineData;
 
-    if (previous.x === current.x && previous.y === current.y) {
+    if (start.x === end.x && start.y === end.y) {
       return;
     }
 
+    canvasContext.lineWidth = this._canvasControl.strokeWidth();
+    canvasContext.strokeStyle = this._canvasControl.cursorMode() === CursorMode.Rubber
+      ? RUBBER_COLOUR
+      : this._canvasControl.colour();
+
     canvasContext.beginPath();
-    canvasContext.moveTo(previous.x, previous.y);
-    canvasContext.lineTo(current.x, current.y);
+    canvasContext.moveTo(start.x, start.y);
+    canvasContext.lineTo(end.x, end.y);
     canvasContext.closePath();
     canvasContext.stroke();
   }
@@ -147,5 +195,12 @@ export class CanvasComponent {
 
   private storeCanvasSnapshot(canvasContext: CanvasRenderingContext2D): void {
     this._canvasHistory.addSnapshot(canvasContext.getImageData(0, 0, this._canvas.width, this._canvas.height));
+  }
+
+  private toCanvasPosition(event: MouseEvent): CanvasPosition {
+    return {
+      x: Math.floor(event.clientX - this._canvas.getBoundingClientRect().left),
+      y: Math.floor(event.clientY - this._canvas.getBoundingClientRect().top),
+    };
   }
 }
