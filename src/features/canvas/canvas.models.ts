@@ -13,6 +13,7 @@ export type LineData = {
 export type CanvasEventData = {
   mouseDownFreeDraw$: Observable<MouseEvent>;
   mouseDownLine$: Observable<MouseEvent>;
+  mouseDownFill$: Observable<MouseEvent>;
   canvasPosition$: Observable<CanvasPosition>;
   lineData$: Observable<LineData>;
   mouseUp$: Observable<MouseEvent>;

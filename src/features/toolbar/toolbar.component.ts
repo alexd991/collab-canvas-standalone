@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { CanvasControlService } from '../canvas';
-import { BrushControlComponent, ColourSelectorComponent } from './tools';
+import { BrushControlComponent, ColourSelectorComponent, FloodFillComponent } from './tools';
 
 @Component({
   selector: 'app-toolbar',
@@ -11,6 +11,7 @@ import { BrushControlComponent, ColourSelectorComponent } from './tools';
   imports: [
     ColourSelectorComponent,
     BrushControlComponent,
+    FloodFillComponent,
   ],
 })
 export class ToolbarComponent {

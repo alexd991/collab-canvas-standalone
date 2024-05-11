@@ -27,7 +27,8 @@ export class BrushControlComponent {
 
   public readonly halfStrokeRadius = computed(() => this.strokeDiameter() / 4);
   public readonly iconUrl = computed(() => {
-    switch (this.cursorMode()) {
+    const cursorMode = this.cursorMode();
+    switch (cursorMode) {
       case CursorMode.Brush:
         return CursorModeUrl.Brush;
       case CursorMode.Rubber:
@@ -35,7 +36,7 @@ export class BrushControlComponent {
       case CursorMode.Line:
         return CursorModeUrl.Line;
       default:
-        return '';
+        return ""
     }
   });
 

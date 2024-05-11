@@ -4,6 +4,7 @@ import { CanvasControlService, CanvasHistoryService } from './services';
 import { CanvasEventData, CursorMode, CanvasPosition, LineData } from './canvas.models';
 import { DOCUMENT, WINDOW } from '../../tokens';
 import { FOOTER_HEIGHT, IDEAL_CANVAS_DIMENSION_PCT, LINE_STYLE, NAVBAR_HEIGHT, RUBBER_COLOUR } from '../../utils';
+import { FillData, colourMatch, hexToRGBA, getOldColour, replacePixel } from '../toolbar/tools/flood-fill';
 
 @Component({
   selector: 'app-canvas',
@@ -46,13 +47,21 @@ export class CanvasComponent {
   private createCanvasEventData(canvasContext: CanvasRenderingContext2D): CanvasEventData {
     const mouseDownFreeDraw$ = fromEvent<MouseEvent>(this._canvas, 'pointerdown')
       .pipe(
-        filter(() => this._canvasControl.cursorMode() !== CursorMode.Line),
+        filter(
+          () => this._canvasControl.cursorMode() === CursorMode.Brush || this._canvasControl.cursorMode() === CursorMode.Rubber
+        ),
         tap(() => this.storeCanvasSnapshot(canvasContext)),
       );
 
     const mouseDownLine$ = fromEvent<MouseEvent>(this._canvas, 'pointerdown')
       .pipe(
         filter(() => this._canvasControl.cursorMode() === CursorMode.Line),
+        tap(() => this.storeCanvasSnapshot(canvasContext)),
+      );
+
+    const mouseDownFill$ = fromEvent<MouseEvent>(this._canvas, 'pointerdown')
+      .pipe(
+        filter(() => this._canvasControl.cursorMode() === CursorMode.Fill),
         tap(() => this.storeCanvasSnapshot(canvasContext)),
       );
 
@@ -76,6 +85,7 @@ export class CanvasComponent {
     return {
       mouseDownFreeDraw$,
       mouseDownLine$,
+      mouseDownFill$,
       canvasPosition$,
       lineData$,
       mouseUp$,
@@ -87,6 +97,7 @@ export class CanvasComponent {
     const {
       mouseDownFreeDraw$,
       mouseDownLine$,
+      mouseDownFill$,
       canvasPosition$,
       lineData$,
       mouseUp$,
@@ -98,9 +109,7 @@ export class CanvasComponent {
         .pipe(
           switchMap(() => lineData$.pipe(takeUntil(mouseUp$)))
         )
-        .subscribe((lineData) => {
-          this.drawBrushStroke(canvasContext, lineData);
-        })
+        .subscribe((lineData) => this.drawBrushStroke(canvasContext, lineData))
     );
 
     this._subscriptions.add(
@@ -121,6 +130,20 @@ export class CanvasComponent {
 
           this.drawBrushStroke(canvasContext, lineData);
         })
+    );
+
+    this._subscriptions.add(
+      mouseDownFill$
+      .pipe(
+        map((event: MouseEvent): FillData => {
+          const startPosition = this.toCanvasPosition(event);
+          const imageData = canvasContext.getImageData(0, 0, this._canvas.width, this._canvas.height);
+          const oldColour = getOldColour(imageData, startPosition);
+          const newColour = hexToRGBA(this._canvasControl.colour());
+
+          return { startPosition, imageData, oldColour, newColour };
+        })
+      ).subscribe((fillData) =>  this.floodFill(canvasContext, fillData))
     );
 
     this._subscriptions.add(
@@ -174,6 +197,37 @@ export class CanvasComponent {
     canvasContext.lineTo(end.x, end.y);
     canvasContext.closePath();
     canvasContext.stroke();
+  }
+
+  private floodFill(
+    canvasContext: CanvasRenderingContext2D,
+    fillData: FillData
+  ): void {
+    const { startPosition, imageData, oldColour, newColour } = fillData;
+
+    const data = imageData.data;
+    const xLength = imageData.width;
+    const yLength = imageData.height;
+    const startIdx = [startPosition.x, startPosition.y] as const;
+
+    const queue = [startIdx];
+
+    while(queue.length) {
+      const [x, y] = queue.pop()!;
+
+      if (x < 0 || x >= xLength || y < 0 || y >= yLength) {
+        continue;
+      }
+
+      const index = (y * xLength + x) * 4;
+
+      if (colourMatch(data.slice(index, index + 4), oldColour)) {
+        replacePixel(data, index, newColour);
+        queue.push([x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]);
+      }
+    }
+
+    canvasContext.putImageData(imageData, 0, 0);
   }
 
   private setCanvasDimensions(): void {
