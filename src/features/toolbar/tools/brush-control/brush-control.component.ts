@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation, computed, input, model } from '@angular/core';
+import { Component, ViewEncapsulation, computed, input, model, signal } from '@angular/core';
 import { MatSliderModule } from '@angular/material/slider';
 import { CommonModule } from '@angular/common';
 import { CursorMode, CursorModeUrl } from '../../../canvas';
@@ -24,11 +24,11 @@ export class BrushControlComponent {
   public readonly colour = input.required<string>();
   public readonly strokeDiameter = model.required<number>();
   public readonly cursorMode = model.required<CursorMode>();
+  public readonly storedCursorMode = signal<CursorMode>(CursorMode.Brush);
 
   public readonly halfStrokeRadius = computed(() => this.strokeDiameter() / 4);
   public readonly iconUrl = computed(() => {
-    const cursorMode = this.cursorMode();
-    switch (cursorMode) {
+    switch (this.storedCursorMode()) {
       case CursorMode.Brush:
         return CursorModeUrl.Brush;
       case CursorMode.Rubber:
@@ -45,21 +45,30 @@ export class BrushControlComponent {
       cursorMode: CursorMode.Brush,
       cursorModeUrl: CursorModeUrl.Brush,
       class: "brush",
-      selected: computed(() => this.cursorMode() === CursorMode.Brush),
+      selected: computed(() => this.storedCursorMode() === CursorMode.Brush),
     },
     {
       cursorMode: CursorMode.Rubber,
       cursorModeUrl: CursorModeUrl.Rubber,
       class: "rubber",
-      selected: computed(() => this.cursorMode() === CursorMode.Rubber),
+      selected: computed(() => this.storedCursorMode() === CursorMode.Rubber),
     },
     {
       cursorMode: CursorMode.Line,
       cursorModeUrl: CursorModeUrl.Line,
       class: "line",
-      selected: computed(() => this.cursorMode() === CursorMode.Line),
+      selected: computed(() => this.storedCursorMode() === CursorMode.Line),
     },
   ];
+
+  public readonly shouldToggleModal = () => {
+    if(this.cursorMode() === CursorMode.Fill) {
+      this.setNewCursorMode(this.storedCursorMode());
+      return false;
+    }
+
+    return true;
+  };
 
   protected setNewStrokeDiameter(inputEvent: Event): void {
     this.strokeDiameter.set(Number((inputEvent.target as HTMLInputElement).value));
@@ -67,5 +76,9 @@ export class BrushControlComponent {
 
   protected setNewCursorMode(newMode: CursorMode): void {
     this.cursorMode.set(newMode);
+
+    if(this.storedCursorMode() !== newMode) {
+      this.storedCursorMode.set(newMode);
+    }
   }
 }

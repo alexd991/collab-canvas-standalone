@@ -10,14 +10,13 @@ export type LineData = {
   end: CanvasPosition;
 };
 
-export type CanvasEventData = {
+export type CanvasEventStreams = {
   mouseDownFreeDraw$: Observable<MouseEvent>;
   mouseDownLine$: Observable<MouseEvent>;
   mouseDownFill$: Observable<MouseEvent>;
   canvasPosition$: Observable<CanvasPosition>;
   lineData$: Observable<LineData>;
   mouseUp$: Observable<MouseEvent>;
-  canvasContext: CanvasRenderingContext2D;
 }
 
 export enum CursorMode {

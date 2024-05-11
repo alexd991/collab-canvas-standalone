@@ -1,11 +1,12 @@
 <app-icon-modal
+  [shouldToggleFn]="shouldToggleModal"
   [iconUrl]="iconUrl()"
-  [iconTitle]="cursorMode()"
+  [iconTitle]="storedCursorMode()"
   iconAlt="paintbrush">
   <div class="brush-control-modal">
     <div class="stroke-width">
       <div class="title">
-        {{ cursorMode() }} Width
+        {{ storedCursorMode() }} Width
         <span class="value">
           <strong>{{ strokeDiameter() }}</strong>
         </span>

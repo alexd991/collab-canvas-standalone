@@ -18,7 +18,7 @@ export function getOldColour(imageData: ImageData, position: CanvasPosition): RG
   return [data[index], data[index + 1], data[index + 2], data[index + 3]];
 }
 
-export function colourMatch(a: Uint8ClampedArray, b: RGBA): boolean {
+export function colourMatch(a: RGBA | Uint8ClampedArray, b: RGBA | Uint8ClampedArray): boolean {
   return a[0] === b[0] && a[1] === b[1] && a[2] === b[2] && a[3] === b[3];
 }
 

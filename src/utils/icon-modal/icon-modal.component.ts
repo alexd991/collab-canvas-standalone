@@ -14,11 +14,20 @@ export class IconModalComponent {
   private readonly _elRef = inject(ElementRef);
   protected readonly showModal = signal<boolean>(false);
 
+  public readonly shouldToggleFn = input<() => boolean>();
   public readonly iconUrl = input.required<string>();
   public readonly iconTitle = input.required<string>();
   public readonly iconClass = input<string>();
 
-  public toggleModal(): void {
+  public onIconClick(): void {
+    const shouldToggleFn = this.shouldToggleFn();
+
+    if(!shouldToggleFn || shouldToggleFn()) {
+      this.toggleModal();
+    }
+  }
+
+  private toggleModal(): void {
     this.showModal.update((value) => !value);
   }
 
