@@ -6,13 +6,20 @@
   .bar-sizing();
 
   &>div {
-    margin-right: 3vw;
     height: 40px;
-    width: 4vw;
+    width: 6vw;
     display: flex;
     justify-content: center;
     align-items: center;
     box-sizing: content-box;
+
+    @media (max-width: 1366px){
+      width: 12vw;
+    }
+
+    @media (max-width: 480px){
+      width: 18vw;
+    }
   }
 
   .brush-control,
