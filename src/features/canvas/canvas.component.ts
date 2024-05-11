@@ -3,7 +3,7 @@ import { Subscription, debounceTime, filter, fromEvent, map, pairwise, startWith
 import { CanvasControlService, CanvasHistoryService } from './services';
 import { CanvasEventStreams, CursorMode, CanvasPosition, LineData } from './canvas.models';
 import { DOCUMENT, WINDOW } from '../../tokens';
-import { FOOTER_HEIGHT, IDEAL_CANVAS_DIMENSION_PCT, LINE_STYLE, NAVBAR_HEIGHT, RUBBER_COLOUR } from '../../utils';
+import { FOOTER_HEIGHT, IDEAL_CANVAS_DIMENSION_PCT, LINE_STYLE, NAVBAR_HEIGHT, WHITE, lineHasNoLength } from '../../utils';
 import { FillData, colourMatch, hexToRGBA, getOldColour, replacePixel } from '../toolbar/tools/flood-fill';
 
 @Component({
@@ -45,42 +45,37 @@ export class CanvasComponent {
   }
 
   private createCanvasEventStreams(canvasContext: CanvasRenderingContext2D): CanvasEventStreams {
-    const mouseDownFreeDraw$ = fromEvent<MouseEvent>(this._canvas, 'pointerdown')
-      .pipe(
-        filter(
-          () => this._canvasControl.cursorMode() === CursorMode.Brush || this._canvasControl.cursorMode() === CursorMode.Rubber
-        ),
-        tap(() => this.storeCanvasSnapshot(canvasContext)),
-      );
+    const mouseDownFreeDraw$ = fromEvent<MouseEvent>(this._canvas, 'pointerdown').pipe(
+      filter(
+        () => this._canvasControl.cursorMode() === CursorMode.Brush || this._canvasControl.cursorMode() === CursorMode.Rubber
+      ),
+      tap(() => this.storeCanvasSnapshot(canvasContext)),
+    );
 
-    const mouseDownLine$ = fromEvent<MouseEvent>(this._canvas, 'pointerdown')
-      .pipe(
-        filter(() => this._canvasControl.cursorMode() === CursorMode.Line),
-        tap(() => this.storeCanvasSnapshot(canvasContext)),
-      );
+    const mouseDownLine$ = fromEvent<MouseEvent>(this._canvas, 'pointerdown').pipe(
+      filter(() => this._canvasControl.cursorMode() === CursorMode.Line),
+      tap(() => this.storeCanvasSnapshot(canvasContext)),
+    );
 
-    const mouseDownFill$ = fromEvent<MouseEvent>(this._canvas, 'pointerdown')
-      .pipe(
-        filter(() => this._canvasControl.cursorMode() === CursorMode.Fill),
-        tap(() => this.storeCanvasSnapshot(canvasContext)),
-      );
+    const mouseDownFill$ = fromEvent<MouseEvent>(this._canvas, 'pointerdown').pipe(
+      filter(() => this._canvasControl.cursorMode() === CursorMode.Fill),
+      tap(() => this.storeCanvasSnapshot(canvasContext)),
+    );
 
     const mouseUp$ = fromEvent<MouseEvent>(this._document, 'pointerup');
 
-    const canvasPosition$ = fromEvent<MouseEvent>(this._canvas, 'pointermove')
-      .pipe(
-        map((event: MouseEvent) => this.toCanvasPosition(event)),
-      );
+    const canvasPosition$ = fromEvent<MouseEvent>(this._canvas, 'pointermove').pipe(
+      map((event: MouseEvent) => this.toCanvasPosition(event)),
+    );
 
-    const lineData$ = canvasPosition$
-      .pipe(
-        pairwise(),
-        map(([start, end]): LineData => ({ start, end })),
-        startWith<LineData>({
-          start: { x: 0, y: 0 },
-          end: { x: 0, y: 0 },
-        }),
-      );
+    const lineData$ = canvasPosition$.pipe(
+      pairwise(),
+      map(([start, end]): LineData => ({ start, end })),
+      startWith<LineData>({
+        start: { x: 0, y: 0 },
+        end: { x: 0, y: 0 },
+      }),
+    );
 
     return {
       mouseDownFreeDraw$,
@@ -106,38 +101,35 @@ export class CanvasComponent {
     } = canvasEventStreams;
 
     this._subscriptions.add(
-      mouseDownFreeDraw$
-        .pipe(
-          switchMap(() => lineData$.pipe(takeUntil(mouseUp$)))
-        )
-        .subscribe((lineData) => this.drawBrushStroke(lineData, canvasContext))
+      mouseDownFreeDraw$.pipe(
+        switchMap(() => lineData$.pipe(takeUntil(mouseUp$)))
+      )
+      .subscribe((lineData) => this.drawBrushStroke(lineData, canvasContext))
     );
 
     this._subscriptions.add(
-      mouseDownLine$
-        .pipe(
-          map((event: MouseEvent) => [this.toCanvasPosition(event), this._canvasHistory.latestSnapshotCopy()] as const),
-          switchMap(([start, snapshot]) => canvasPosition$
-            .pipe(
-              map((end) => [start, end, snapshot] as const),
-              takeUntil(mouseUp$)
-            ),
-          ),
-        ).subscribe(([start, end, snapshot]) => {
-          // remove temporary line by restoring the previous snapshot
-          if(snapshot){
-            canvasContext.putImageData(snapshot, 0, 0);
-          }
+      mouseDownLine$.pipe(
+        map((mouseEvent) => [this.toCanvasPosition(mouseEvent), this._canvasHistory.latestSnapshotCopy()] as const),
+        switchMap(([start, snapshot]) => canvasPosition$.pipe(
+            map((end) => [start, end, snapshot] as const),
+            takeUntil(mouseUp$),
+          )
+        ),
+      )
+      .subscribe(([start, end, snapshot]) => {
+        // remove temporary line by restoring the previous snapshot
+        if(snapshot){
+          canvasContext.putImageData(snapshot, 0, 0);
+        }
 
-          this.drawBrushStroke({ start, end }, canvasContext)
-        })
+        this.drawBrushStroke({ start, end }, canvasContext)
+      })
     );
 
     this._subscriptions.add(
-      mouseDownFill$
-      .pipe(
-        map((event: MouseEvent): FillData => {
-          const startPosition = this.toCanvasPosition(event);
+      mouseDownFill$.pipe(
+        map((mouseEvent): FillData => {
+          const startPosition = this.toCanvasPosition(mouseEvent);
           const imageData = canvasContext.getImageData(0, 0, this._canvas.width, this._canvas.height);
           const oldColour = getOldColour(imageData, startPosition);
           const newColour = hexToRGBA(this._canvasControl.colour());
@@ -145,7 +137,8 @@ export class CanvasComponent {
           return { startPosition, imageData, oldColour, newColour };
         }),
         filter(({ oldColour, newColour }) => !colourMatch(oldColour, newColour)),
-      ).subscribe((fillData) =>  this.floodFill(fillData, canvasContext))
+      )
+      .subscribe((fillData) =>  this.floodFill(fillData, canvasContext))
     );
 
     this._subscriptions.add(
@@ -183,7 +176,7 @@ export class CanvasComponent {
     lineData: LineData,
     canvasContext: CanvasRenderingContext2D,
   ): void {
-    if(this.lineHasNoLength(lineData)) {
+    if(lineHasNoLength(lineData)) {
       return;
     }
 
@@ -191,7 +184,7 @@ export class CanvasComponent {
 
     canvasContext.lineWidth = this._canvasControl.strokeDiameter();
     canvasContext.strokeStyle = this._canvasControl.cursorMode() === CursorMode.Rubber
-      ? RUBBER_COLOUR
+      ? WHITE
       : this._canvasControl.colour();
 
     canvasContext.beginPath();
@@ -246,7 +239,7 @@ export class CanvasComponent {
   }
 
   private fillCanvasWhite(canvasContext: CanvasRenderingContext2D): void {
-    canvasContext.fillStyle = RUBBER_COLOUR;
+    canvasContext.fillStyle = WHITE;
     canvasContext.fillRect(0, 0, this._canvas.width, this._canvas.height);
   }
 
@@ -259,10 +252,5 @@ export class CanvasComponent {
       x: Math.floor(event.clientX - this._canvas.getBoundingClientRect().left),
       y: Math.floor(event.clientY - this._canvas.getBoundingClientRect().top),
     };
-  }
-
-  private lineHasNoLength(lineData: LineData): boolean {
-    const { start, end } = lineData;
-    return start.x === end.x && start.y === end.y;
   }
 }
