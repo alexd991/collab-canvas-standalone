@@ -15,7 +15,7 @@ export type CanvasEventStreams = {
   mouseDownLine$: Observable<MouseEvent>;
   mouseDownFill$: Observable<MouseEvent>;
   canvasPosition$: Observable<CanvasPosition>;
-  lineData$: Observable<LineData>;
+  lineSegment$: Observable<LineData>;
   mouseUp$: Observable<MouseEvent>;
 }
 
