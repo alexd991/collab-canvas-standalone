@@ -1,6 +1,6 @@
 import { CanvasPosition } from "../../../canvas";
 
-export type RGBA = [number, number, number, number];
+export type RGBA = readonly [number, number, number, number];
 
 export type FillData = {
   startPosition: CanvasPosition;

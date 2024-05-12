@@ -18,7 +18,7 @@ export class NavbarComponent {
     private readonly _canvasHistory: CanvasHistoryService,
   ) { }
 
-  public readonly hasSnapshots = this._canvasHistory.hasSnapshots;
+  public readonly canUndo = this._canvasHistory.hasSnapshots;
 
   public clearCanvas(): void {
     this._canvasControl.clearCanvas();

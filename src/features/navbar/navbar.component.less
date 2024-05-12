@@ -37,7 +37,7 @@
       width: 30px;
       content: url(../../assets/undo.svg);
 
-      &.disabled {
+      &:not(.enabled) {
         pointer-events: none;
         filter: brightness(0.75);
       }

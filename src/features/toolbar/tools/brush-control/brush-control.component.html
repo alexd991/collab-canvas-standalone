@@ -1,8 +1,8 @@
 <app-icon-modal
   [shouldToggleFn]="shouldToggleModal"
   [iconUrl]="iconUrl()"
+  [iconAlt]="storedCursorMode()"
   iconTitle="Mode Control"
-  iconAlt="paintbrush"
   (click)="onClick()">
   <div class="brush-control-modal">
     <div class="stroke-width">

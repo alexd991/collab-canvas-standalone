@@ -4,7 +4,7 @@ import { CanvasControlService, CanvasHistoryService } from './services';
 import { CanvasEventStreams, CursorMode, CanvasPosition, LineData } from './canvas.models';
 import { DOCUMENT, WINDOW } from '../../tokens';
 import { FOOTER_HEIGHT, IDEAL_CANVAS_DIMENSION_PCT, LINE_STYLE, NAVBAR_HEIGHT, WHITE, lineHasNoLength } from '../../utils';
-import { FillData, colourMatch, hexToRGBA, getOldColour, replacePixel, floodFillImageData } from '../toolbar/tools/flood-fill';
+import { FillData, coloursMatch, floodFillImageData, toRGBA } from '../toolbar/tools/flood-fill';
 
 @Component({
   selector: 'app-canvas',
@@ -99,58 +99,19 @@ export class CanvasComponent {
     } = canvasEventStreams;
 
     this._subscriptions.add(
-      mouseDownFreeDraw$.pipe(
-        switchMap(() => lineData$.pipe(takeUntil(mouseUp$)))
-      )
-      .subscribe((lineData) => this.drawBrushStroke(lineData, canvasContext))
+      this.freeDrawSubscription(mouseDownFreeDraw$, lineData$, mouseUp$, canvasContext)
     );
 
     this._subscriptions.add(
-      mouseDownLine$.pipe(
-        map((mouseEvent) => [this.toCanvasPosition(mouseEvent), this._canvasHistory.latestSnapshotCopy()] as const),
-        switchMap(([start, snapshot]) => canvasPosition$.pipe(
-            map((end) => [start, end, snapshot] as const),
-            takeUntil(mouseUp$),
-          )
-        ),
-      )
-      .subscribe(([start, end, snapshot]) => {
-        // remove temporary line by restoring the previous snapshot
-        if(snapshot){
-          canvasContext.putImageData(snapshot, 0, 0);
-        }
-
-        this.drawBrushStroke({ start, end }, canvasContext)
-      })
+      this.straightLineSubscription(mouseDownLine$, canvasPosition$, mouseUp$, canvasContext)
     );
 
     this._subscriptions.add(
-      mouseDownFill$.pipe(
-        map((mouseEvent): FillData => {
-          const startPosition = this.toCanvasPosition(mouseEvent);
-          const imageData = canvasContext.getImageData(0, 0, this._canvas.width, this._canvas.height);
-          const oldColour = getOldColour(imageData, startPosition);
-          const newColour = hexToRGBA(this._canvasControl.colour());
-
-          return { startPosition, imageData, oldColour, newColour };
-        }),
-        filter(({ oldColour, newColour }) => !colourMatch(oldColour, newColour)),
-      )
-      .subscribe((fillData) =>  this.floodFill(fillData, canvasContext))
+      this.fillSubscription(mouseDownFill$, canvasContext)
     );
 
     this._subscriptions.add(
-      fromEvent(this._window, 'resize')
-        .pipe(debounceTime(10))
-        .subscribe(() => {
-          const imageData = canvasContext.getImageData(0, 0, this._canvas.width, this._canvas.height);
-
-          this.setCanvasDimensions();
-          this.initialiseCanvasContext(canvasContext);
-          this.fillCanvasWhite(canvasContext);
-
-          canvasContext.putImageData(imageData, 0, 0);
-        })
+      this.resizeSubscription(canvasContext)
     );
 
     this._subscriptions.add(
@@ -236,5 +197,75 @@ export class CanvasComponent {
       filter(filterCond),
       tap(() => this.storeCanvasSnapshot(canvasContext)),
     );
+  }
+
+  private straightLineSubscription(
+    mouseDownLine$: Observable<MouseEvent>,
+    canvasPosition$: Observable<CanvasPosition>,
+    mouseUp$: Observable<MouseEvent>,
+    canvasContext: CanvasRenderingContext2D
+  ): Subscription {
+    return mouseDownLine$.pipe(
+      map((mouseEvent) => [this.toCanvasPosition(mouseEvent), this._canvasHistory.latestSnapshotCopy()] as const),
+      switchMap(([start, snapshot]) => canvasPosition$.pipe(
+          map((end) => [start, end, snapshot] as const),
+          takeUntil(mouseUp$),
+        )
+      ),
+    )
+    .subscribe(([start, end, snapshot]) => {
+      // remove temporary line by restoring the previous snapshot
+      if(snapshot){
+        canvasContext.putImageData(snapshot, 0, 0);
+      }
+
+      this.drawBrushStroke({ start, end }, canvasContext);
+    });
+  }
+
+  private fillSubscription(
+    mouseDownFill$: Observable<MouseEvent>,
+    canvasContext: CanvasRenderingContext2D
+  ): Subscription {
+    return mouseDownFill$.pipe(
+      map((mouseEvent): FillData => {
+        const startPosition = this.toCanvasPosition(mouseEvent);
+        const imageData = canvasContext.getImageData(0, 0, this._canvas.width, this._canvas.height);
+        const oldColour = toRGBA(imageData, startPosition);
+        const newColour = toRGBA(this._canvasControl.colour());
+
+        return { startPosition, imageData, oldColour, newColour };
+      }),
+      filter(({ oldColour, newColour }) => !coloursMatch(oldColour, newColour)),
+    )
+    .subscribe((fillData) =>  this.floodFill(fillData, canvasContext));
+  }
+
+  private freeDrawSubscription(
+    mouseDownFreeDraw$: Observable<MouseEvent>,
+    lineData$: Observable<LineData>,
+    mouseUp$: Observable<MouseEvent>,
+    canvasContext: CanvasRenderingContext2D
+  ): Subscription {
+    return mouseDownFreeDraw$.pipe(
+      switchMap(() => lineData$.pipe(takeUntil(mouseUp$)))
+    )
+    .subscribe((lineData) => this.drawBrushStroke(lineData, canvasContext))
+  }
+
+  private resizeSubscription(
+    canvasContext: CanvasRenderingContext2D
+  ): Subscription {
+    return fromEvent(this._window, 'resize')
+      .pipe(debounceTime(10))
+      .subscribe(() => {
+        const imageData = canvasContext.getImageData(0, 0, this._canvas.width, this._canvas.height);
+
+        this.setCanvasDimensions();
+        this.initialiseCanvasContext(canvasContext);
+        this.fillCanvasWhite(canvasContext);
+
+        canvasContext.putImageData(imageData, 0, 0);
+      });
   }
 }

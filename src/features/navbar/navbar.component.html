@@ -3,7 +3,7 @@
     <img src="../assets/pencil-rocket.svg" alt="Rocket Pencil" />
   </span>
   <a (click)="undo()" title="Undo">
-    <span class="icon undo" [ngClass]="{disabled: !hasSnapshots()}">
+    <span class="icon undo" [ngClass]="{'enabled': canUndo()}">
     </span>
   </a>
   <a (click)="clearCanvas()" title="Clear Canvas">

@@ -6,19 +6,21 @@
   .bar-sizing();
 
   &>div {
+    margin: 0 1vw;
     height: 40px;
-    width: 6vw;
+    width: 3vw;
     display: flex;
     justify-content: center;
     align-items: center;
     box-sizing: content-box;
 
     @media (max-width: 1366px){
-      width: 12vw;
+      width: 8vw;
     }
 
     @media (max-width: 480px){
-      width: 18vw;
+      margin: 0 0.5vw;
+      width: 12vw;
     }
   }
 
