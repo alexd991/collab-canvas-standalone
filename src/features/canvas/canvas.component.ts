@@ -98,37 +98,14 @@ export class CanvasComponent {
       mouseUp$,
     } = canvasEventStreams;
 
-    this._subscriptions.add(
-      this.freeDrawSubscription(mouseDownFreeDraw$, lineData$, mouseUp$, canvasContext)
-    );
-
-    this._subscriptions.add(
-      this.straightLineSubscription(mouseDownLine$, canvasPosition$, mouseUp$, canvasContext)
-    );
-
-    this._subscriptions.add(
-      this.fillSubscription(mouseDownFill$, canvasContext)
-    );
-
-    this._subscriptions.add(
-      this.resizeSubscription(canvasContext)
-    );
-
-    this._subscriptions.add(
-      this._canvasControl.canvasUndo$.subscribe(() => {
-        const latestSnapshot = this._canvasHistory.latestSnapshot();
-        if (latestSnapshot) {
-          canvasContext.putImageData(latestSnapshot, 0, 0);
-        }
-      })
-    );
-
-    this._subscriptions.add(
-      this._canvasControl.clearCanvas$.subscribe(() => {
-        this.storeCanvasSnapshot(canvasContext);
-        this.fillCanvasWhite(canvasContext);
-      })
-    );
+    [
+      this.freeDrawSubscription(mouseDownFreeDraw$, lineData$, mouseUp$, canvasContext),
+      this.straightLineSubscription(mouseDownLine$, canvasPosition$, mouseUp$, canvasContext),
+      this.fillSubscription(mouseDownFill$, canvasContext),
+      this.resizeCanvasSubscription(canvasContext),
+      this.undoSubscription(canvasContext),
+      this.clearCanvasSubscription(canvasContext),
+    ].forEach((subscription) => this._subscriptions.add(subscription));
   }
 
   private drawBrushStroke(
@@ -190,11 +167,11 @@ export class CanvasComponent {
   }
 
   private createPointerDownEvent(
-    filterCond: () => boolean,
+    conditionFn: () => boolean,
     canvasContext: CanvasRenderingContext2D
   ): Observable<MouseEvent> {
     return fromEvent<MouseEvent>(this._canvas, 'pointerdown').pipe(
-      filter(filterCond),
+      filter(conditionFn),
       tap(() => this.storeCanvasSnapshot(canvasContext)),
     );
   }
@@ -253,9 +230,7 @@ export class CanvasComponent {
     .subscribe((lineData) => this.drawBrushStroke(lineData, canvasContext))
   }
 
-  private resizeSubscription(
-    canvasContext: CanvasRenderingContext2D
-  ): Subscription {
+  private resizeCanvasSubscription(canvasContext: CanvasRenderingContext2D): Subscription {
     return fromEvent(this._window, 'resize')
       .pipe(debounceTime(10))
       .subscribe(() => {
@@ -267,5 +242,22 @@ export class CanvasComponent {
 
         canvasContext.putImageData(imageData, 0, 0);
       });
+  }
+
+  private undoSubscription(canvasContext: CanvasRenderingContext2D): Subscription {
+    return this._canvasControl.canvasUndo$.subscribe(() => {
+      const latestSnapshot = this._canvasHistory.latestSnapshot();
+
+      if (latestSnapshot) {
+        canvasContext.putImageData(latestSnapshot, 0, 0);
+      }
+    });
+  }
+
+  private clearCanvasSubscription(canvasContext: CanvasRenderingContext2D): Subscription {
+    return this._canvasControl.clearCanvas$.subscribe(() => {
+      this.storeCanvasSnapshot(canvasContext);
+      this.fillCanvasWhite(canvasContext);
+    });
   }
 }
