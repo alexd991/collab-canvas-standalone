@@ -9,10 +9,10 @@
       [colour]="colour()"
       [(strokeDiameter)]="strokeDiameter"
       [(cursorMode)]="cursorMode"
-      (clickEmitter)="setToolbarItem(SelectableToolbarItem.BrushControl)"
+      (clickEmitter)="setToolbarItem($event)"
     />
   </div>
   <div class="flood-fill" [ngClass]="{'selected': selectedToolbarItem() === SelectableToolbarItem.FloodFill}">
-    <app-flood-fill (clickEmitter)="setToolbarItem(SelectableToolbarItem.FloodFill)"/>
+    <app-flood-fill (clickEmitter)="setToolbarItem($event)"/>
   </div>
 </div>

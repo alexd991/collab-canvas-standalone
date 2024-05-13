@@ -3,8 +3,8 @@ import { Observable, Subscription, debounceTime, filter, fromEvent, map, pairwis
 import { CanvasControlService, CanvasHistoryService } from './services';
 import { CanvasEventStreams, CursorMode, CanvasPosition, LineData } from './canvas.models';
 import { DOCUMENT, WINDOW } from '../../tokens';
-import { FOOTER_HEIGHT, IDEAL_CANVAS_DIMENSION_PCT, LINE_STYLE, NAVBAR_HEIGHT, WHITE, lineHasNoLength } from '../../utils';
-import { FillData, coloursMatch, floodFillImageData, toRGBA } from '../toolbar/tools/flood-fill';
+import { FOOTER_HEIGHT, IDEAL_CANVAS_DIMENSION_PCT, LINE_STYLE, NAVBAR_HEIGHT, WHITE, lineHasNoLength, toRGBA, coloursMatch } from '../../utils';
+import { FillData, floodFillImageData } from '../toolbar/tools/flood-fill';
 
 @Component({
   selector: 'app-canvas',
@@ -55,18 +55,19 @@ export class CanvasComponent {
     );
 
     const mouseDownFill$ = this.createPointerDownEvent(
-      () => this._canvasControl.cursorMode() === CursorMode.Fill
+      () => this._canvasControl.cursorMode() === CursorMode.Fill,
+      false,
     );
 
     const mouseUp$ = fromEvent<MouseEvent>(this._document, 'pointerup');
 
-    const canvasPosition$ = fromEvent<MouseEvent>(this._canvas, 'pointermove').pipe(
+    const canvasPosition$ = fromEvent<MouseEvent>(this._document, 'pointermove').pipe(
       map((event: MouseEvent) => this.toCanvasPosition(event)),
     );
 
     const lineSegment$ = canvasPosition$.pipe(
       pairwise(),
-      map(([start, end]): LineData => ({ start, end })),
+      map(([start, end]): LineData => this.clampLineData({ start, end })),
       startWith<LineData>({
         start: { x: 0, y: 0 },
         end: { x: 0, y: 0 },
@@ -149,17 +150,13 @@ export class CanvasComponent {
     this._canvasHistory.addSnapshot(snapshot);
   }
 
-  private toCanvasPosition(event: MouseEvent): CanvasPosition {
-    return {
-      x: Math.floor(event.clientX - this._canvas.getBoundingClientRect().left),
-      y: Math.floor(event.clientY - this._canvas.getBoundingClientRect().top),
-    };
-  }
-
-  private createPointerDownEvent(conditionFn: () => boolean): Observable<MouseEvent> {
+  private createPointerDownEvent(
+    conditionFn: () => boolean,
+    takeSnapshot: boolean = true
+  ): Observable<MouseEvent> {
     return fromEvent<MouseEvent>(this._canvas, 'pointerdown').pipe(
       filter(conditionFn),
-      tap(() => this.storeCanvasSnapshot()),
+      tap(() => takeSnapshot && this.storeCanvasSnapshot()),
     );
   }
 
@@ -171,18 +168,18 @@ export class CanvasComponent {
     return mouseDownLine$.pipe(
       map((mouseEvent) => [this.toCanvasPosition(mouseEvent), this._canvasHistory.latestSnapshotCopy()] as const),
       switchMap(([start, snapshot]) => canvasPosition$.pipe(
-          map((end) => [start, end, snapshot] as const),
+          map((end) => [this.clampLineData({ start, end }), snapshot] as const),
           takeUntil(mouseUp$),
         )
       ),
     )
-    .subscribe(([start, end, snapshot]) => {
-      // remove temporary line by restoring the previous snapshot
+    .subscribe(([lineData, snapshot]) => {
+      // remove temporary line by restoring a copy of the previous snapshot
       if(snapshot){
         this._canvasContext.putImageData(snapshot, 0, 0);
       }
 
-      this.drawBrushStroke({ start, end });
+      this.drawBrushStroke(lineData);
     });
   }
 
@@ -198,7 +195,10 @@ export class CanvasComponent {
       }),
       filter(({ oldColour, newColour }) => !coloursMatch(oldColour, newColour)),
     )
-    .subscribe((fillData) =>  this.floodFill(fillData));
+    .subscribe((fillData) => {
+      this.storeCanvasSnapshot();
+      this.floodFill(fillData);
+    });
   }
 
   private freeDrawSubscription(
@@ -241,5 +241,26 @@ export class CanvasComponent {
       this.storeCanvasSnapshot();
       this.fillCanvasWhite();
     });
+  }
+
+  private toCanvasPosition(event: MouseEvent): CanvasPosition {
+    return {
+      x: Math.floor(event.clientX - this._canvas.getBoundingClientRect().left),
+      y: Math.floor(event.clientY - this._canvas.getBoundingClientRect().top),
+    };
+  }
+
+  private clampLineData(lineData: LineData): LineData {
+    const clampCanvasPosition = (position: CanvasPosition): CanvasPosition => {
+      return {
+        x: Math.min(Math.max(position.x, 0), this._canvas.width),
+        y: Math.min(Math.max(position.y, 0), this._canvas.height),
+      }
+    }
+
+    return {
+      start: clampCanvasPosition(lineData.start),
+      end: clampCanvasPosition(lineData.end),
+    }
   }
 }
