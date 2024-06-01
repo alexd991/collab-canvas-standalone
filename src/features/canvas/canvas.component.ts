@@ -46,18 +46,20 @@ export class CanvasComponent {
   }
 
   private createCanvasEventStreams(): CanvasEventStreams {
-    const mouseDownFreeDraw$ = this.createPointerDownEvent(
-      () => this._canvasControl.cursorMode() === CursorMode.Brush || this._canvasControl.cursorMode() === CursorMode.Rubber
-    );
+    const mouseDownFreeDraw$ = this.createPointerDownEvent({
+      conditionFn: () => this._canvasControl.cursorMode() === CursorMode.Brush || this._canvasControl.cursorMode() === CursorMode.Rubber,
+      takeSnapshot: true,
+    });
 
-    const mouseDownLine$ = this.createPointerDownEvent(
-      () => this._canvasControl.cursorMode() === CursorMode.Line
-    );
+    const mouseDownLine$ = this.createPointerDownEvent({
+      conditionFn: () => this._canvasControl.cursorMode() === CursorMode.Line,
+      takeSnapshot: true,
+    });
 
-    const mouseDownFill$ = this.createPointerDownEvent(
-      () => this._canvasControl.cursorMode() === CursorMode.Fill,
-      false,
-    );
+    const mouseDownFill$ = this.createPointerDownEvent({
+      conditionFn: () => this._canvasControl.cursorMode() === CursorMode.Fill,
+      takeSnapshot: false,
+    });
 
     const mouseUp$ = fromEvent<MouseEvent>(this._document, 'pointerup');
 
@@ -129,8 +131,8 @@ export class CanvasComponent {
   }
 
   private setCanvasDimensions(): void {
-    this._canvas.height = (this._document.body.clientHeight - (NAVBAR_HEIGHT + FOOTER_HEIGHT)) * IDEAL_CANVAS_DIMENSION_PCT;
-    this._canvas.width = this._document.body.clientWidth * IDEAL_CANVAS_DIMENSION_PCT;
+    this._canvas.height = (this._window.innerHeight - (NAVBAR_HEIGHT + FOOTER_HEIGHT)) * IDEAL_CANVAS_DIMENSION_PCT;
+    this._canvas.width = this._window.innerWidth * IDEAL_CANVAS_DIMENSION_PCT;
   }
 
   private initialiseCanvasContext(): void {
@@ -151,9 +153,10 @@ export class CanvasComponent {
   }
 
   private createPointerDownEvent(
-    conditionFn: () => boolean,
-    takeSnapshot: boolean = true
+    args: { conditionFn: () => boolean, takeSnapshot: boolean }
   ): Observable<MouseEvent> {
+    const { conditionFn, takeSnapshot } = args;
+
     return fromEvent<MouseEvent>(this._canvas, 'pointerdown').pipe(
       filter(conditionFn),
       tap(() => takeSnapshot && this.storeCanvasSnapshot()),
