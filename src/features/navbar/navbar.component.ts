@@ -21,7 +21,7 @@ export class NavbarComponent {
   public readonly canUndo = this._canvasHistory.hasSnapshots;
 
   public clearCanvas(): void {
-    this._canvasControl.clearCanvas();
+    this._canvasControl.clear();
   }
 
   public undo(): void {

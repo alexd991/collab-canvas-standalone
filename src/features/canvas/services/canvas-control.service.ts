@@ -14,7 +14,7 @@ export class CanvasControlService {
   public readonly strokeDiameter = signal(15);
   public readonly cursorMode = signal(CursorMode.Brush);
 
-  public clearCanvas(): void {
+  public clear(): void {
     this._clearCanvasSubject.next();
   }
 
