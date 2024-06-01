@@ -1,5 +1,5 @@
 import { Signal } from "@angular/core";
-import { CursorMode, CursorModeUrl } from "../../../canvas";
+import { CursorMode, CursorModeUrl } from "../../../../utils";
 
 export type BrushControlButton = {
   cursorMode: CursorMode;

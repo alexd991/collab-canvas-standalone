@@ -1,7 +1,6 @@
 import { Component, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { CursorMode, CursorModeUrl } from '../../../canvas';
-import { IconButtonComponent } from '../../../../utils/icon-button/icon-button.component';
+import { IconButtonComponent, CursorMode, CursorModeUrl } from '../../../../utils';
 import { ISelectableToolbarItem, SelectableToolbarItem } from '../../toolbar.models';
 
 @Component({

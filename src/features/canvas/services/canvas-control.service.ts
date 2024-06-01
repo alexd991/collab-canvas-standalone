@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import { Subject } from 'rxjs';
-import { CursorMode } from '../canvas.models';
+import { CursorMode } from '../../../utils';
 
 @Injectable({ providedIn: 'root' })
 export class CanvasControlService {

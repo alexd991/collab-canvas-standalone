@@ -1,8 +1,7 @@
 import { Component, ViewEncapsulation, computed, input, model, output, signal } from '@angular/core';
 import { MatSliderModule } from '@angular/material/slider';
 import { CommonModule } from '@angular/common';
-import { CursorMode, CursorModeUrl } from '../../../canvas';
-import { IconModalComponent } from '../../../../utils';
+import { IconModalComponent, CursorMode, CursorModeUrl } from '../../../../utils';
 import { BrushControlButton } from './brush-control.models';
 import { ISelectableToolbarItem, SelectableToolbarItem } from '../../toolbar.models';
 

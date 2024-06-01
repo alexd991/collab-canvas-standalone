@@ -1,5 +1,6 @@
 import { CanvasPosition, LineData } from "../features/canvas";
-import { RGBA } from "../features/toolbar/tools/flood-fill";
+import { RGBA } from "./common.models";
+
 
 export function lineHasNoLength(lineData: LineData): boolean {
   const { start, end } = lineData;
@@ -33,7 +34,13 @@ function imageDataToRGBA(imageData: ImageData, position: CanvasPosition): RGBA {
   const data = imageData.data;
   const xLength = imageData.width;
   const index = (position.y * xLength + position.x) * 4;
-  return [data[index], data[index + 1], data[index + 2], data[index + 3]];
+
+  return [
+    data[index],
+    data[index + 1],
+    data[index + 2],
+    data[index + 3]
+  ];
 }
 
 /**
