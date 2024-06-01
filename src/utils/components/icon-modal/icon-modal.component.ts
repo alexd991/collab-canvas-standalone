@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, ElementRef, HostListener, ViewEncapsulation, input, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { hostAttribute } from '../host-attribute';
-import { CursorMode } from '../common.models';
+import { hostAttribute } from '../../host-attribute';
+import { CursorMode } from '../../models';
 
 @Component({
   selector: 'app-icon-modal',

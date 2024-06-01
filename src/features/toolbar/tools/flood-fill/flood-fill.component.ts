@@ -1,7 +1,7 @@
 import { Component, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IconButtonComponent, CursorMode, CursorModeUrl } from '../../../../utils';
-import { ISelectableToolbarItem, SelectableToolbarItem } from '../../toolbar.models';
+import { IconButtonComponent } from '../../../../utils/components';
+import { CursorMode, CursorModeUrl, ISelectableToolbarItem, SelectableToolbarItem  } from '../../../../utils/models';
 
 @Component({
   selector: 'app-flood-fill',

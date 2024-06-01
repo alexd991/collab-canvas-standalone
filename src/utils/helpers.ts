@@ -1,6 +1,4 @@
-import { CanvasPosition, LineData } from "../features/canvas";
-import { RGBA } from "./common.models";
-
+import { RGBA, CanvasPosition, LineData } from "./models";
 
 export function lineHasNoLength(lineData: LineData): boolean {
   const { start, end } = lineData;
