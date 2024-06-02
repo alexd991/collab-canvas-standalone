@@ -28,7 +28,7 @@
       "utils/*": [ "./src/utils/*" ],
       "features": [ "./src/features/index.ts" ],
       "features/*": [ "./src/features/*" ],
-      "tokens": [ "./src/tokens/index.ts" ],
+      "injection-tokens": [ "./src/injection-tokens/index.ts" ],
     }
   },
   "angularCompilerOptions": {
