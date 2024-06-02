@@ -3,9 +3,9 @@ import { Observable, Subscription, debounceTime, filter, fromEvent, map, pairwis
 import { CanvasControlService, CanvasHistoryService } from './services';
 import { DOCUMENT, WINDOW } from '../../tokens';
 import { floodFillImageData } from '../toolbar/tools/flood-fill';
-import { FOOTER_HEIGHT, IDEAL_CANVAS_DIMENSION_PCT, LINE_STYLE, NAVBAR_HEIGHT, WHITE } from '../../utils/constants';
-import { CanvasEventStreams, CanvasPosition, LineData, FillData, CursorMode } from '../../utils/models';
-import { lineHasNoLength, toRGBA, coloursMatch } from '../../utils/helpers';
+import { FOOTER_HEIGHT, IDEAL_CANVAS_DIMENSION_PCT, LINE_STYLE, NAVBAR_HEIGHT, WHITE } from 'utils/constants';
+import { CanvasEventStreams, CanvasPosition, LineData, FillData, CursorMode } from 'utils/models';
+import { lineHasNoLength, toRGBA, coloursMatch } from 'utils/helpers';
 
 @Component({
   selector: 'app-canvas',

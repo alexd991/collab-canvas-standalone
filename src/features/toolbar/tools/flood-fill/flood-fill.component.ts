@@ -1,7 +1,7 @@
 import { Component, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IconButtonComponent } from '../../../../utils/components';
-import { CursorMode, CursorModeUrl, ISelectableToolbarItem, SelectableToolbarItem  } from '../../../../utils/models';
+import { IconButtonComponent } from 'utils/components';
+import { CursorMode, CursorModeUrl, ISelectableToolbarComponent, SelectableToolbarItem  } from 'utils/models';
 
 @Component({
   selector: 'app-flood-fill',
@@ -15,7 +15,7 @@ import { CursorMode, CursorModeUrl, ISelectableToolbarItem, SelectableToolbarIte
   standalone: true,
   imports: [CommonModule, IconButtonComponent],
 })
-export class FloodFillComponent implements ISelectableToolbarItem {
+export class FloodFillComponent implements ISelectableToolbarComponent {
   protected readonly CursorMode = CursorMode;
   protected readonly CursorModeUrl = CursorModeUrl;
 

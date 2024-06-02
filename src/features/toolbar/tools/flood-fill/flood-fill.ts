@@ -1,5 +1,5 @@
-import { coloursMatch } from "../../../../utils/helpers";
-import { RGBA, FillData } from "../../../../utils/models";
+import { coloursMatch } from "utils/helpers";
+import { RGBA, FillData } from "utils/models";
 
 function replacePixel(data: Uint8ClampedArray, index: number, newColour: RGBA): void {
   data[index] = newColour[0];

@@ -1,8 +1,8 @@
 import { Component, ViewEncapsulation, computed, input, model, output, signal } from '@angular/core';
 import { MatSliderModule } from '@angular/material/slider';
 import { CommonModule } from '@angular/common';
-import { IconModalComponent } from '../../../../utils/components';
-import { CursorMode, CursorModeUrl, BrushControlButton, ISelectableToolbarItem, SelectableToolbarItem } from '../../../../utils/models';
+import { IconModalComponent } from 'utils/components';
+import { CursorMode, CursorModeUrl, BrushControlButton, ISelectableToolbarComponent, SelectableToolbarItem } from 'utils/models';
 
 @Component({
   selector: 'app-brush-control',
@@ -16,7 +16,7 @@ import { CursorMode, CursorModeUrl, BrushControlButton, ISelectableToolbarItem, 
     IconModalComponent,
   ],
 })
-export class BrushControlComponent implements ISelectableToolbarItem {
+export class BrushControlComponent implements ISelectableToolbarComponent {
   public readonly CursorMode = CursorMode;
   public readonly CursorModeUrl = CursorModeUrl;
 

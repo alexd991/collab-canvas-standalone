@@ -56,7 +56,7 @@ export enum SelectableToolbarItem {
   FloodFill = "FloodFill",
 }
 
-export interface ISelectableToolbarItem {
+export interface ISelectableToolbarComponent {
   readonly clickEmitter: OutputEmitterRef<SelectableToolbarItem>;
   onClick(): void;
 }
