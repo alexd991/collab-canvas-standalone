@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { CanvasControlService } from '../../../features/canvas';
-import { CursorModeUrl, CursorMode } from '../../models';
+import { CanvasControlService } from 'features/canvas';
+import { CursorModeUrl, CursorMode } from 'utils/models';
 
 @Component({
   selector: 'app-icon-button',

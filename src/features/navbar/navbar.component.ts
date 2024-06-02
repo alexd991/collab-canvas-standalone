@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { CanvasControlService, CanvasHistoryService } from '../canvas';
 import { CommonModule } from '@angular/common';
+import { CanvasControlService, CanvasHistoryService } from 'features/canvas';
 
 @Component({
   selector: 'app-navbar',

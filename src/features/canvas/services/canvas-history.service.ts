@@ -1,5 +1,5 @@
 import { Injectable, computed, signal } from "@angular/core";
-import { UNDO_BUFFER } from "../../../utils";
+import { UNDO_BUFFER } from "utils/constants";
 
 @Injectable({ providedIn: 'root' })
 export class CanvasHistoryService {

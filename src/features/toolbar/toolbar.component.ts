@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { CanvasControlService } from '../canvas';
-import { BrushControlComponent, ColourSelectorComponent, FloodFillComponent } from './tools';
-import { SelectableToolbarItem } from 'utils/models';
 import { CommonModule } from '@angular/common';
+import { CanvasControlService } from 'features/canvas';
+import { SelectableToolbarItem } from 'utils/models';
+import { BrushControlComponent, ColourSelectorComponent, FloodFillComponent } from './tools';
 
 @Component({
   selector: 'app-toolbar',

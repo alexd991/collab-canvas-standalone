@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { CanvasComponent, ToolbarComponent, NavbarComponent } from '../features'
+import { CanvasComponent, ToolbarComponent, NavbarComponent } from 'features';
 
 @Component({
   selector: 'app-root',

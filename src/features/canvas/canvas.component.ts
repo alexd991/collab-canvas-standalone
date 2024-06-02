@@ -1,11 +1,10 @@
 import { ChangeDetectionStrategy, Component, ElementRef, Inject, viewChild } from '@angular/core';
 import { Observable, Subscription, debounceTime, filter, fromEvent, map, pairwise, startWith, switchMap, takeUntil, tap } from 'rxjs';
 import { CanvasControlService, CanvasHistoryService } from './services';
-import { DOCUMENT, WINDOW } from '../../tokens';
-import { floodFillImageData } from '../toolbar/tools/flood-fill';
+import { DOCUMENT, WINDOW } from 'tokens';
 import { FOOTER_HEIGHT, IDEAL_CANVAS_DIMENSION_PCT, LINE_STYLE, NAVBAR_HEIGHT, WHITE } from 'utils/constants';
 import { CanvasEventStreams, CanvasPosition, LineData, FillData, CursorMode } from 'utils/models';
-import { lineHasNoLength, toRGBA, coloursMatch } from 'utils/helpers';
+import { lineHasNoLength, toRGBA, coloursMatch, floodFillImageData } from 'utils/helpers';
 
 @Component({
   selector: 'app-canvas',
